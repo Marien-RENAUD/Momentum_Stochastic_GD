@@ -81,6 +81,7 @@ for i, (batch, targets) in enumerate(test_loader):
     
 print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
+<<<<<<< HEAD
 
 plt.plot(loss_trajectory)
 plt.xlabel("number of iterations")
@@ -123,3 +124,6 @@ for k in range(len(weights_trajectory)):
     scalar_prod = (1/2) * (np.sum(np.array(sum_gradient)**2) - norm)
     racoga = scalar_prod/norm
     print("RACOGA = {}".format(racoga))
+=======
+print("Test Push quoicoumbeh")
+>>>>>>> 8c86cf0d9f70715a065573915795598ddd5b785c
