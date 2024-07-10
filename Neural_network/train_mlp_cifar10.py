@@ -62,3 +62,4 @@ for i, (batch, targets) in enumerate(test_loader):
     
 print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
+print("Test push qouicoumbeh")
