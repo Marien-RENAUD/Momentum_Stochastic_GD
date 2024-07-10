@@ -4,12 +4,14 @@ import torch.nn as nn
 import torchvision.transforms as t
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+from time import time
+from tqdm import tqdm
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # define network structure 
-net = nn.Sequential(nn.Linear(3 * 32 * 32, 1024), nn.BatchNorm1d(1024), nn.ReLU(), nn.Linear(1024, 512), nn.BatchNorm1d(512), nn.ReLU(), 
-                    nn.Linear(512, 256), nn.BatchNorm1d(256), nn.ReLU(), nn.Linear(256, 128), nn.BatchNorm1d(128), nn.ReLU(), nn.Linear(128, 10)).to(device)
+net = nn.Sequential(nn.Linear(3 * 32 * 32, 512), nn.ReLU(), nn.Linear(512, 128),  nn.ReLU(), nn.Linear(128, 10)).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.9)
 
@@ -28,12 +30,11 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=64)
 # To save the trajectory
 weights_trajectory = []
 loss_trajectory = []
-gradients_trajectory = []
 
 # === Train === ###
 net.train()
 
-n_epoch = 3
+n_epoch = 1
 
 # train loop
 for epoch in range(n_epoch):
@@ -53,8 +54,8 @@ for epoch in range(n_epoch):
         optimizer.step()
 
         #save the trajectory
-        gradients = [param.grad.clone() for param in net.parameters()]
-        weights =[param.data.clone() for param in net.parameters()]
+        weights_i =[param.data.clone() for param in net.parameters()]
+        weights_trajectory.append(weights_i)
         loss_trajectory.append(loss.item())
 
         pred = output.max(1, keepdim=True)[1]
@@ -82,7 +83,43 @@ print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
 
 plt.plot(loss_trajectory)
-plt.figsave("Loss trajectory.png")
+plt.xlabel("number of iterations")
+plt.ylabel("Loss")
+plt.savefig("Loss trajectory.png")
 
-print(gradients)
-print(gradients[0])
+print("Number of iterations = {}".format(len(weights_trajectory)))
+
+post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
+
+for k in range(len(weights_trajectory)):
+    print("Iteration {}".format(10*k))
+    x = weights_trajectory[10*k]
+    for j, param in enumerate(net.parameters()):
+        param.data = x[j]
+    gradient_list = []
+
+    for i, (batch, targets) in enumerate(post_process_loader):
+        batch = batch.to(device)
+        output = net(batch)
+        targets = targets.to(device)
+        loss = criterion(output, targets)
+
+        optimizer.zero_grad()
+        loss.backward()
+        #save gardients
+        gradient_i = np.array([])
+        for param in net.parameters():
+            gradient_i = np.concatenate((gradient_i,np.array(param.grad.detach().cpu().numpy().reshape(-1))))
+        gradient_list.append(gradient_i)
+
+    gradient_list = np.array(gradient_list)
+
+    norm = 0
+    sum_gradient = np.zeros(len(gradient_list[0]))
+    for j in tqdm(range(len(gradient_list))):
+        norm += np.sum(np.array(gradient_list[j])**2)
+        sum_gradient += gradient_list[j]
+
+    scalar_prod = (1/2) * (np.sum(np.array(sum_gradient)**2) - norm)
+    racoga = scalar_prod/norm
+    print("RACOGA = {}".format(racoga))
