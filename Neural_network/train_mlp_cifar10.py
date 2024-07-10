@@ -124,6 +124,3 @@ for k in range(len(weights_trajectory)):
     scalar_prod = (1/2) * (np.sum(np.array(sum_gradient)**2) - norm)
     racoga = scalar_prod/norm
     print("RACOGA = {}".format(racoga))
-=======
-print("Test Push quoicoumbeh")
->>>>>>> 8c86cf0d9f70715a065573915795598ddd5b785c
