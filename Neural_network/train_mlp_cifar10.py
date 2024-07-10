@@ -3,6 +3,7 @@ import torchvision
 import torch.nn as nn
 import torchvision.transforms as t
 import os
+import matplotlib.pyplot as plt
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -25,7 +26,6 @@ train_loader = torch.utils.data.DataLoader(train_set, batch_size=64)
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=64)
 
 # To save the trajectory
-
 weights_trajectory = []
 loss_trajectory = []
 gradients_trajectory = []
@@ -52,6 +52,11 @@ for epoch in range(n_epoch):
         loss.backward()
         optimizer.step()
 
+        #save the trajectory
+        gradients = [param.grad.clone() for param in net.parameters()]
+        weights =[param.data.clone() for param in net.parameters()]
+        loss_trajectory.append(loss.item())
+
         pred = output.max(1, keepdim=True)[1]
         train_correct += pred.eq(targets.view_as(pred)).sum().item()
         train_loss += loss
@@ -75,3 +80,9 @@ for i, (batch, targets) in enumerate(test_loader):
     
 print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
+
+plt.plot(loss_trajectory)
+plt.figsave("Loss trajectory.png")
+
+print(gradients)
+print(gradients[0])
