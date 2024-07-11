@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.random as nprandom
 rng = np.random.default_rng()
-def features(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
+def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
     if prompt_bias != None:
         bias = prompt_bias
     else:
@@ -18,6 +18,16 @@ def features(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bia
         cov_matrix = np.dot(random_matrix,random_matrix.T)
         features_matrix = nprandom.multivariate_normal(np.zeros(d),cov_matrix,N)
         return features_matrix,bias
+def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
+    if prompt_lambda_vec == False:
+        lambda_vec = rng.exponential(1,N)
+    else:
+        lambda_vec = prompt_lambda_vec
+    features_matrix = np.eye(N,d)*lambda_vec.reshape(N,1)
+    if prompt_bias != None:
+        prompt_bias = nprandom.normal(nprandom.uniform(-N,N),N,N)
+    return features_matrix,prompt_bias
+
 def f(x,features_matrix,bias):
     return 0.5*np.mean((np.dot(features_matrix,x)-bias)**2)
 def f_sample(x,N,features_matrix,bias):
