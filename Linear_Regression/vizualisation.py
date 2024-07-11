@@ -37,4 +37,4 @@ for j in range(4):
     else:
         plt.plot(np.log(list[j]),label=labels[j],color =col,lw=2)
 plt.legend()
-plt.show()
+plt.savefig("Linear_Regression/results/convergence_linear_regression.png")
