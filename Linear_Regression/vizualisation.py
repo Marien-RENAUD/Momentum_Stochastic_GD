@@ -7,7 +7,7 @@ from func import *
 
 d,N=10,10 #choice of dimension d, number of functions N
 n_sample = 10 #number of parellel occurences of stochastic algorithms
-batch_size = 1 #size of batch
+batch_size = 5 #size of batch
 n_iter=10**3
 
 # gaussian features
@@ -32,7 +32,7 @@ list = [f_gd,f_sgd,f_nag,f_snag]
 labels = ["GD", "Mean-SGD", "NAG", "SNAG"]
 plt.figure(figsize=(10,10))
 color = ["black","grey","red","orange"]
-nb_gd_eval = np.arange(0,n_iter+1,N)
+nb_gd_eval = np.arange(0,n_iter+1,int(N/batch_size))
 for j in range(4):
     col = color[j]
     if len(list[j].shape) >1:
@@ -43,6 +43,6 @@ for j in range(4):
     else:
         plt.plot(nb_gd_eval,np.log(list[j]),label=labels[j],color =col,lw=2)
 plt.xlabel("Nb gradient evaluations",fontsize = 13)
-plt.ylabel(r"$\log(f)",fontsize= 13)
+plt.ylabel(r"$\log(f)$",fontsize= 13)
 plt.legend()
 plt.savefig("Linear_Regression/results/convergence_linear_regression.png")
