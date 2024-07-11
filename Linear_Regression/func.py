@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.random as nprandom
-
+rng = np.random.default_rng()
 def features(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
     if prompt_bias != None:
         b = prompt_bias
