@@ -56,7 +56,7 @@ def GD(x_0,L,n_iter,d,N,features_matrix,bias):
         f_GD[i+1] = f(x_GD[i+1,:],features_matrix,bias)
     return f_GD
 
-def SGD(x_0,L_max,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False):
+def SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False):
     x_SGD = np.empty((n_iter,d,n_sample))
     f_SGD = np.empty((n_iter,n_sample))
     if random_init == True:
@@ -66,7 +66,7 @@ def SGD(x_0,L_max,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_ini
         x_SGD[0,:,:] = x_0.reshape(d,1)
         f_SGD[0,:] = f(x_0,features_matrix,bias)
    
-    step = 1/L_max
+    step = 1/L_sgd
 
     for i in range(n_iter-1):
         gradient_sto = grad_sto_f(x_SGD[i,:,:],d,N,n_sample,batch_size,features_matrix,bias)
