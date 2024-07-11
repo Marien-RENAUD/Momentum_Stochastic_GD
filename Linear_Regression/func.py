@@ -1,3 +1,5 @@
+import numpy as np
+import numpy.random as nprandom
 
 def features(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
     if prompt_bias != None:
@@ -24,7 +26,7 @@ def grad_f(x,N,features_matrix,bias):
     grad =(np.dot(features_matrix,x)-bias).reshape(N,1)*features_matrix
     gradient = np.sum(grad,axis=0)/N
     return gradient
-def grad_sto_f(x,N,batch_size,features_matrix,bias):
+def grad_sto_f(x,N,n_sample,batch_size,features_matrix,bias):
     vec = np.tile(np.arange(N),n_sample).reshape(n_sample,N)
     grad =np.moveaxis((np.dot(features_matrix,x)-bias.reshape(N,1)),0,1).reshape(n_sample,N,1)*features_matrix
     batch_index = rng.permuted(vec,axis=1)[:,:batch_size] 
@@ -52,7 +54,7 @@ def SGD(x_0,L_max,n_iter,n_sample,d,batch_size,N,features_matrix,bias):
     step = 1/L_max
 
     for i in range(n_iter-1):
-        gradient_sto = grad_sto_f(x_SGD[i,:,:],N,batch_size,features_matrix,bias)
+        gradient_sto = grad_sto_f(x_SGD[i,:,:],N,n_sample,batch_size,features_matrix,bias)
         x_SGD[i+1,:,:] = x_SGD[i,:,:] - step*gradient_sto
         f_SGD[i+1,:] = f_sample(x_SGD[i+1,:],N,features_matrix,bias)
     return f_SGD
@@ -94,7 +96,7 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias):
     beta = 1-np.sqrt( (mu/L) )/rho
     alpha = 1/(1+(1/rho)*np.sqrt(mu/L))
     for i in range(1,n_iter_gen):
-        gradient_sto = grad_sto_f(y_snag[i-1,:,:],N,batch_size,features_matrix,bias)
+        gradient_sto = grad_sto_f(y_snag[i-1,:,:],N,n_sample,batch_size,features_matrix,bias)
 
         x_snag[i,:,:] = y_snag[i-1,:,:] - step*gradient_sto
         z_snag[i,:,:] = beta*z_snag[i-1,:,:] + (1-beta)*y_snag[i-1,:,:] - eta*gradient_sto
