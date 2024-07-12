@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm import tqdm
-from train_mlp_cifar10 import create_mlp, create_cnn
+from models_architecture import create_mlp, create_cnn
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -15,10 +15,10 @@ network_type = "CNN"
 # define network structure 
 
 if network_type == "mlp":# MLP architecture
-    net = create_mlp()
+    net = create_mlp().to(device)
 
 if network_type == "CNN":# Light CNN architecture
-    net = create_cnn()
+    net = create_cnn().to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.9)
@@ -41,7 +41,6 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 ###
 # Computation of RACOGA
 ###
-
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 
 step = 100

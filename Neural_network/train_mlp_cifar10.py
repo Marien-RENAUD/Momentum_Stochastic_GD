@@ -7,40 +7,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm import tqdm
+from models_architecture import create_mlp, create_cnn
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 network_type = "CNN"
 # define network structure 
 
-def create_mlp():
-    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10)).to(device)
-
-def create_cnn():
-    net = nn.Sequential(
-    nn.Conv2d(3, 16, kernel_size=3, padding=1), nn.ReLU(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
-
-    nn.Conv2d(16, 32, kernel_size=3, padding=1), nn.ReLU(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
-
-    nn.Conv2d(32, 64, kernel_size=3, padding=1), nn.ReLU(),
-    nn.MaxPool2d(kernel_size=2, stride=2),
-
-    nn.Conv2d(64, 128, kernel_size=3, padding=1), nn.ReLU(),
-    nn.AdaptiveAvgPool2d((1, 1)),
-
-    nn.Flatten(),
-    nn.Linear(128, 10)
-    )
-    net = net.to(device)
-    return net
-
 if network_type == "mlp":# MLP architecture
-    net = create_mlp()
+    net = create_mlp().to(device)
 
 if network_type == "CNN":# Light CNN architecture
-    net = create_cnn()
+    net = create_cnn().to(device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.9)
@@ -131,4 +109,4 @@ dict_results = {
     "loss_trajectory" : loss_trajectory
 }
 
-torch.save(dict_results, 'dict_results.pth')
+torch.save(dict_results, path_result+'dict_results.pth')
