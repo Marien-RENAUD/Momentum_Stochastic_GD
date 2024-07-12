@@ -13,10 +13,10 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 network_type = "CNN"
 # define network structure 
 
-if network_type == "mlp":# MLP architecture
-    net = nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10)).to(device)
+def create_mlp():
+    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10)).to(device)
 
-if network_type == "CNN":# Light CNN architecture
+def create_cnn():
     net = nn.Sequential(
     nn.Conv2d(3, 16, kernel_size=3, padding=1), nn.ReLU(),
     nn.MaxPool2d(kernel_size=2, stride=2),
@@ -32,8 +32,15 @@ if network_type == "CNN":# Light CNN architecture
 
     nn.Flatten(),
     nn.Linear(128, 10)
-)
+    )
     net = net.to(device)
+    return net
+
+if network_type == "mlp":# MLP architecture
+    net = create_mlp()
+
+if network_type == "CNN":# Light CNN architecture
+    net = create_cnn()
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.9)
@@ -111,10 +118,17 @@ for i, (batch, targets) in enumerate(test_loader):
 print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
 
+#Save the training loss
+path_result = "results/"
+
 plt.plot(loss_trajectory)
 plt.xlabel("number of iterations")
 plt.ylabel("Loss")
-plt.savefig("Loss trajectory.png")
+plt.savefig(path_result+"Loss trajectory.png")
 
-print("Number of iterations = {}".format(len(weights_trajectory)))
+dict_results = {
+    "weights_trajectory" : weights_trajectory,
+    "loss_trajectory" : loss_trajectory
+}
 
+torch.save(dict_results, 'dict_results.pth')
