@@ -44,9 +44,13 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 
 step = 100
+racoga_list = []
+scalar_prod_list = []
+iteration_list = []
 
-for k in range(len(weights_trajectory)//step):
-    print("Iteration {}".format(step*k))
+for k in tqdm(range(len(weights_trajectory)//step)):
+    # print("Iteration {}".format(step*k))
+    iteration_list.append(step*k)
     x = weights_trajectory[step*k]
     for j, param in enumerate(net.parameters()):
         param.data = x[j]
@@ -64,7 +68,7 @@ for k in range(len(weights_trajectory)//step):
 
         optimizer.zero_grad()
         loss.backward()
-        #save gardients
+        #save gradients
         gradient_i = torch.tensor([]).to(device)
         for param in net.parameters():
             gradient_i = torch.cat((gradient_i,param.grad.flatten()))
@@ -76,5 +80,13 @@ for k in range(len(weights_trajectory)//step):
 
     scalar_prod = (1/2) * (torch.sum(sum_gradient**2) - sum_gradient_norm)
     racoga = scalar_prod/sum_gradient_norm
-    print("SCALAR PRODUCT = {:.2f}".format(scalar_prod))
-    print("RACOGA = {:.2f}".format(racoga))
+    # print("SCALAR PRODUCT = {:.2f}".format(scalar_prod))
+    # print("RACOGA = {:.2f}".format(racoga))
+    racoga_list.append(racoga)
+    scalar_prod_list.append(racoga)
+
+#Save the racoga evolution
+plt.plot(iteration_list, racoga_list)
+plt.xlabel("number of iterations")
+plt.ylabel("RACOGA")
+plt.savefig(path_results+"RACOGA evolution.png")
