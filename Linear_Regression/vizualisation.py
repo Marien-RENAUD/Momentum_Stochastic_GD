@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from func import *
 ## Où importer les modules?
 
-d,N=20,20 #choice of dimension d, number of functions N
+d,N=10,10 #choice of dimension d, number of functions N
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
 n_iter=10**4
@@ -14,7 +14,7 @@ n_iter=10**4
 features_matrix,bias = features_gaussian(d,N)
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N)
-bias = np.zeros(N)
+# bias = np.zeros(N)
 
 x_0 = nprandom.normal(0,1,d)
 mu = nplinalg.eig(np.dot(features_matrix.T,features_matrix))[0].min()/N
@@ -59,7 +59,7 @@ plt.xlabel("Nb gradient evaluations",fontsize = 13)
 plt.ylabel(r"$\log(f)$",fontsize= 13)
 plt.legend()
 plt.title("N = " + str(N))
-plt.savefig("Linear_Regression/results/convergence_linear_regression_d=N.png")
+plt.savefig("Linear_Regression/results/convergence_linear_regression_d=N_2.png")
 plt.figure(figsize=(10,5))
 plt.subplot(121)
 plt.yticks((racoga_gd.min(),0,racoga_gd.max()))
@@ -76,6 +76,6 @@ plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
 # plt.plot(racoga_snag)
 # print("racoga sgd", racoga_sgd.min())
 # print("racoga snag", racoga_snag.min())
-plt.savefig("Linear_Regression/results/racoga_d=N.png")
+plt.savefig("Linear_Regression/results/racoga_d=N_2.png")
 print("L_max = ", L_max," L = ", L, "rhoL = ", rho*L)
 print(2*L_max < rho*L)
