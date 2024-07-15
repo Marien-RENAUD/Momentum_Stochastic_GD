@@ -82,8 +82,8 @@ for k in tqdm(range(len(weights_trajectory)//step)):
     racoga = scalar_prod/sum_gradient_norm
     # print("SCALAR PRODUCT = {:.2f}".format(scalar_prod))
     # print("RACOGA = {:.2f}".format(racoga))
-    racoga_list.append(racoga)
-    scalar_prod_list.append(racoga)
+    racoga_list.append(racoga.detach().cpu().numpy())
+    scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
 
 #Save the racoga evolution
 plt.plot(iteration_list, racoga_list)

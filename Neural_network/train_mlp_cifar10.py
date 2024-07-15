@@ -41,7 +41,7 @@ batch_size = 64
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size)
 
-# To obtain non-homogeneous batches
+# To obtain non-homogeneous batches: batches that are composed of one class.
 non_homogeneous = True
 if non_homogeneous:
     batch_sort = [[] for i in range(10)]
@@ -140,14 +140,15 @@ print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
 
 
-#Save the training loss
+# Save the training loss
 path_result = "results/"
 
 plt.plot(loss_trajectory)
 plt.xlabel("number of iterations")
-plt.ylabel("Loss")
-plt.savefig(path_result+"Loss trajectory.png")
+plt.ylabel("Training Loss")
+plt.savefig(path_result+"Training_trajectory.png")
 
+# Save the training trajectory in a torch dictionary
 dict_results = {
     "weights_trajectory" : weights_trajectory,
     "loss_trajectory" : loss_trajectory
