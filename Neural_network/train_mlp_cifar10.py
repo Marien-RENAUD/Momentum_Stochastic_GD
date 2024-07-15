@@ -67,8 +67,8 @@ if non_homogeneous:
         batch_shuffle.append(batch_sort_2[i*batch_size:(i+1)*batch_size])
         targets_shuffle.append(targets_sort_2[i*batch_size:(i+1)*batch_size])
     batch_shuffle = np.array(batch_shuffle)
-    batch_shuffle = torch.tensor(batch_shuffle)
-    targets_shuffle = torch.tensor(targets_shuffle)
+    batch_shuffle = torch.tensor(batch_shuffle).to(device)
+    targets_shuffle = torch.tensor(targets_shuffle).to(device)
 
 # To save the trajectory
 weights_trajectory = []
