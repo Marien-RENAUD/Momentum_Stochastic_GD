@@ -1,5 +1,7 @@
 # Momentum_Stochastic_GD
 
+This code analyse the converge of optimization framework in a convex and non-convex context. 
+
 ## File Structure
 ```
 - dataset : collection of used datasets (CIFAR-10)
