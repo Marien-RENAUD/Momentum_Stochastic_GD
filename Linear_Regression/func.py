@@ -22,7 +22,7 @@ def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,p
         return features_matrix,bias
     
 def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
-    if prompt_lambda_vec == None:
+    if prompt_lambda_vec == False:
         lambda_vec = rng.exponential(1,N)
     else:
         lambda_vec = prompt_lambda_vec

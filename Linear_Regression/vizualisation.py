@@ -5,20 +5,19 @@ import matplotlib.pyplot as plt
 from func import *
 ## Où importer les modules?
 
-d,N=100,2 #choice of dimension d, number of functions N
+d,N=100 ,100 #choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=1*10**3
+n_iter=1*10**4
 
 # gaussian features
 features_matrix,bias = features_gaussian(d,N)
 # Orthogonal features
-# features_matrix,bias = features_orthogonal(d,N,prompt_lambda_vec = np.ones(N))
-lambda_vec = np.linspace(0.9, 2,N)
-features_matrix = np.eye(N,d)*lambda_vec.reshape(N,1)
+features_matrix,bias = features_orthogonal(d,N)
+# lambda_vec = np.ones(N)
+# features_matrix = np.eye(N,d)*lambda_vec.reshape(N,1)
 bias = np.zeros(N)
-print(features_matrix)
 x_0 = nprandom.normal(0,1,d)
 
 ## We compute L and mu using AA^T or AA^T, where A is the matrix feature, depending of which matrix is the largest
@@ -31,11 +30,9 @@ if d>N:
 else: 
     mu = nplinalg.eig(np.dot(features_matrix.T,features_matrix))[0].min()/N
     L = nplinalg.eig(np.dot(features_matrix.T,features_matrix))[0].max()/N
-print(nplinalg.eig(np.dot(features_matrix,features_matrix.T))[0])
+print("Conditionnement : ", mu/L)
 
-
-rho = np.array([0.75,1,1.2])*N/batch_size
-print(rho)
+rho = np.array([0.8,1,1.2,1.5])*N/batch_size
 vec_norm= (features_matrix**2).sum(axis=1)
 L_max = vec_norm.max()
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
@@ -56,8 +53,6 @@ nb_alg = len(list)
 nb_rho = len(rho)
 nb_gd_eval = np.arange(0,n_iter+1,int(N/batch_size))
 k = 0
-print(f_nag)
-
 for j in range(nb_alg):
     if j==0:
         col = "black"
@@ -74,7 +69,8 @@ for j in range(nb_alg):
         plt.plot(np.log(min_alg),color =col,linestyle ="--")
         plt.plot(np.log(max_alg),color =col,linestyle ="--")
     else:
-        plt.plot(nb_gd_eval,np.log(list[j]),label=labels[j],color =col,lw=2)
+        print("a")
+        # plt.plot(nb_gd_eval,np.log(list[j]),label=labels[j],color =col,lw=2)
 plt.xlabel("Nb gradient evaluations",fontsize = 13)
 plt.ylabel(r"$\log(f)$",fontsize= 13)
 plt.legend()
