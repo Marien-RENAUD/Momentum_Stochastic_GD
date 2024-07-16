@@ -8,7 +8,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 
 case = np.load("case.npy") # 0 : overparameterized, 1 : d=N, 2 : underparameterized
-biased_features = np.load("biased_features.npy")
+biased_features = np.load("biased_features.npy") # True : biased features
 
 if biased_features == True:
     path_figure_root= 'results/biased_features'
@@ -130,7 +130,3 @@ table.set_fontsize(13)
 axs.set_title("Table of statistics of racoga value along iterations",fontsize=13)
 # plt.tight_layout()
 plt.savefig(path_figure_racoga + 'table.png')
-plt.figure(figsize=(10,5))
-for j in range(10):
-    plt.plot(np.log(algo["sgd"][:,j]))
-plt.show()
