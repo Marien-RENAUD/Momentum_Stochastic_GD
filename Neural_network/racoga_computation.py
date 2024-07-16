@@ -11,6 +11,7 @@ from models_architecture import create_mlp, create_cnn
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
+non_homogeneous = False
 network_type = "CNN"
 # define network structure 
 
@@ -32,7 +33,11 @@ train_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochast
 
 # Load results
 path_results = "results/"
-dict_results = torch.load(path_results+"dict_results.pth")
+n_epoch = 8
+dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_dict_results.pth'
+if non_homogeneous:
+    dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_nonhomogeneous_dict_results.pth'
+dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]
 
@@ -44,12 +49,15 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 
 step = 100
+racoga_list = []
+scalar_prod_list = []
+iteration_list = []
 
-for k in range(len(weights_trajectory)//step):
-    print("Iteration {}".format(step*k))
+for k in tqdm(range(len(weights_trajectory)//step)):
+    iteration_list.append(step*k)
     x = weights_trajectory[step*k]
     for j, param in enumerate(net.parameters()):
-        param.data = x[j]
+        param.data = x[j].to(device)
     sum_gradient = torch.tensor([]).to(device)
     sum_gradient_norm = 0
 
@@ -64,7 +72,7 @@ for k in range(len(weights_trajectory)//step):
 
         optimizer.zero_grad()
         loss.backward()
-        #save gardients
+        #save gradients
         gradient_i = torch.tensor([]).to(device)
         for param in net.parameters():
             gradient_i = torch.cat((gradient_i,param.grad.flatten()))
@@ -76,5 +84,19 @@ for k in range(len(weights_trajectory)//step):
 
     scalar_prod = (1/2) * (torch.sum(sum_gradient**2) - sum_gradient_norm)
     racoga = scalar_prod/sum_gradient_norm
-    print("SCALAR PRODUCT = {:.2f}".format(scalar_prod))
-    print("RACOGA = {:.2f}".format(racoga))
+    racoga_list.append(racoga.detach().cpu().numpy())
+    scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
+
+#Save the RACOGA evolution
+dict = {
+    "racoga_list" : racoga_list,
+    "scalar_prod_list" : scalar_prod_list,
+    "iteration_list" : iteration_list,
+}
+save_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_racoga_results.npy'
+np.save(save_path, dict)
+
+plt.plot(iteration_list, racoga_list)
+plt.xlabel("number of iterations")
+plt.ylabel("RACOGA")
+plt.savefig(path_results+"RACOGA evolution.png")
