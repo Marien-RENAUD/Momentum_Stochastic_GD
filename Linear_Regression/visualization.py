@@ -3,27 +3,35 @@ import matplotlib.pyplot as plt
 import os as os
 print(os.getcwd() )
 
-case = 0 # 0 : overparameterized, 1 : d=N, 2 : underparameterized
+version_bis = True # Set true to not overwrite the first experiment
+
+case = np.load("case.npy") # 0 : overparameterized, 1 : d=N, 2 : underparameterized
 path_figure_root_cv= 'convergence_linear_regression_'
 path_figure_root_racoga  = 'racoga_'
 if case == 0:
     suffixe = 'overparameterized'
-    path_figure_cv = 'results/overparameterized/' + path_figure_root_cv +' convergence_linear_regression_'+ 'overparameterized.png'
-    path_figure_racoga = 'results/overparameterized/' + path_figure_root_racoga + 'overparameterized.png'
+    if version_bis == True:
+        suffixe += '_bis'
+    path_figure_cv = 'results/overparameterized/convergence_linear_regression_' + suffixe + '.png'
+    path_figure_racoga = 'results/overparameterized/racoga_' + suffixe + '.png' 
     param= np.load("param_" + suffixe +".npy",allow_pickle=True).item()
     algo = np.load("algo_" + suffixe +".npy",allow_pickle=True).item()
     racoga = np.load("racoga_" + suffixe +".npy",allow_pickle=True).item()
 elif case == 1:
     suffixe = 'd=N'
-    path_figure_cv = 'results/d=N/' + path_figure_root_cv + 'convergence_linear_regression_'+ 'd_N.png'
-    path_figure_racoga = 'results/d=N/' + path_figure_root_racoga + 'd=N.png'
+    if version_bis == True:
+        suffixe += '_bis'
+    path_figure_cv = 'results/d=N/convergence_linear_regression_' + suffixe + '.png'
+    path_figure_racoga = 'results/d=N/racoga_' + suffixe + '.png' 
     param= np.load("param_" + suffixe +".npy",allow_pickle=True).item()
     algo = np.load("algo_" + suffixe +".npy",allow_pickle=True).item()
     racoga = np.load("racoga_" + suffixe +".npy",allow_pickle=True).item()
 else:
     suffixe = 'underparameterized'
-    path_figure_cv = 'results/underparameterized/' + path_figure_root_cv + 'convergence_linear_regression_' + 'underparameterized.png'
-    path_figure_racoga = 'results/underparameterized/' + path_figure_root_racoga + 'underparameterized.png' 
+    if version_bis == True:
+        suffixe += '_bis'
+    path_figure_cv = 'results/underparameterized/convergence_linear_regression_' + suffixe + '.png'
+    path_figure_racoga = 'results/underparameterized/racoga_' + suffixe + '.png' 
     param= np.load("param_" + suffixe +".npy",allow_pickle=True).item()
     algo = np.load("algo_" + suffixe +".npy",allow_pickle=True).item()
     racoga = np.load("racoga_" + suffixe +".npy",allow_pickle=True).item()
@@ -71,9 +79,8 @@ plt.title("RACOGA condition along iterations",fontsize = 10)
 plt.legend()
 plt.subplot(122)
 for j in range(nb_rho):
-    col = (0.5, j/nb_alg ,1-j/nb_alg)
+    col = (0.5, j/nb_rho ,1-j/nb_rho)
     plt.hist(racoga[index[j+3]],bins=np.linspace(racoga[index[j+3]].min(),racoga[index[j+3]].max(),50),edgecolor="black",facecolor = col,label = labels[j+3])
 plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
 plt.legend()
 plt.savefig(path_figure_racoga)
-print(4*np.sqrt(L_max/mu)*np.sqrt(L_max/L))

@@ -5,17 +5,19 @@ import numpy.random as nprandom
 from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
 ## Où importer les modules?
 
-d,N=1000 ,10 #choice of dimension d, number of functions N
+version_bis = True # Set true to not overwrite the first data experiment
+
+d,N=10,500 #choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
     case = 1
 else:
     case = 2  # 0 : overparameterized, 1 : d=N, 2 : underparameterized
-
+np.save("case",case)
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=3*10**2
+n_iter=3*10**3
 
 # gaussian features
 features_matrix,bias = features_gaussian(d,N)
@@ -39,7 +41,8 @@ else:
 print("Conditionnement : ", mu/L)
 
 rho = np.array([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
-# rho = np.array([0.01,0.1,1])*N/batch_size ## Underparameterized exemple value
+if case== 2:
+    rho = np.array([0.01,0.1,1])*N/batch_size ## Underparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 L_max = vec_norm.max()
@@ -63,10 +66,16 @@ for i in range(len(rho)):
 
 if case == 0:
     suffixe = 'overparameterized'
+    if version_bis == True:
+        suffixe += '_bis'
 elif case == 1:
     suffixe = 'd=N'
+    if version_bis == True:
+        suffixe += '_bis'
 else:
     suffixe = "underparameterized"
+    if version_bis == True:
+        suffixe += '_bis'
 
 param = {'d' : d, 'N' : N,'n_iter' : n_iter, 'batch_size' : batch_size, 'mu' : mu, 'L' : L, 'L_max' : L_max, 'L_sgd' : L_sgd, 'rho' : rho}
 np.save("param_"+suffixe,param) ### If not working, set working directory to /Linear_Regression
