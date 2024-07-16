@@ -3,14 +3,14 @@ import numpy.random as nprandom
 
 rng = np.random.default_rng()
 
-def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
+def features_gaussian(d,N,mean,prompt_random_matrix = None,prompt_cov_matrix = None,prompt_bias = None):
     if prompt_bias != None:
         bias = prompt_bias
     else:
         bias = nprandom.normal(nprandom.uniform(-N,N),N,N)
     if prompt_cov_matrix != None:
         cov_matrix = prompt_cov_matrix
-        features_matrix = nprandom.multivariate_normal(np.zeros(d),Cov_matrix,N)
+        features_matrix = nprandom.multivariate_normal(mean,Cov_matrix,N)
         return features_matrix,b
     else:
         if prompt_random_matrix != None:
@@ -18,7 +18,7 @@ def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,p
         else:
             random_matrix = nprandom.uniform(-1,1,(d,d))  
         cov_matrix = np.dot(random_matrix,random_matrix.T)
-        features_matrix = nprandom.multivariate_normal(np.zeros(d),cov_matrix,N)
+        features_matrix = nprandom.multivariate_normal(mean,cov_matrix,N)
         return features_matrix,bias
     
 def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
