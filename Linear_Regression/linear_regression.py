@@ -11,7 +11,7 @@ def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,p
     if prompt_cov_matrix != None:
         cov_matrix = prompt_cov_matrix
         features_matrix = nprandom.multivariate_normal(np.zeros(d),Cov_matrix,N)
-        return features_matrix, b
+        return features_matrix,b
     else:
         if prompt_random_matrix != None:
             random_matrix = prompt_random_matrix
@@ -19,7 +19,7 @@ def features_gaussian(d,N,prompt_random_matrix = None,prompt_cov_matrix = None,p
             random_matrix = nprandom.uniform(-1,1,(d,d))  
         cov_matrix = np.dot(random_matrix,random_matrix.T)
         features_matrix = nprandom.multivariate_normal(np.zeros(d),cov_matrix,N)
-        return features_matrix, bias
+        return features_matrix,bias
     
 def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
     if prompt_lambda_vec == False:
@@ -29,7 +29,7 @@ def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
     features_matrix = np.eye(N,d)*lambda_vec.reshape(N,1)
     if prompt_bias != None:
         prompt_bias = nprandom.normal(nprandom.uniform(-N,N),N,N)
-    return features_matrix, prompt_bias
+    return features_matrix,prompt_bias
 
 def f(x,features_matrix,bias):
     return 0.5*np.mean((np.dot(features_matrix,x)-bias)**2)
