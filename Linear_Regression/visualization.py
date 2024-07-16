@@ -76,3 +76,4 @@ for j in range(nb_rho):
 plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
 plt.legend()
 plt.savefig(path_figure_racoga)
+print(4*np.sqrt(L_max/mu)*np.sqrt(L_max/L))
