@@ -8,7 +8,7 @@ from linear_regression import * ## Il y a des problèmes dans le code, les promp
 version_bis = False # Set true to not overwrite the first data experiment
 ## data results folder
 
-d,N=10,500 #choice of dimension d, number of functions N
+d,N=50,50 #choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
@@ -18,7 +18,7 @@ else:
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=1*10**4
+n_iter=3*10**3
 
 # gaussian features
 mean = np.ones(d)*10
