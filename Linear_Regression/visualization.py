@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os as os
 print(os.getcwd() )
 
-case = 2 # 0 : overparameterized, 1 : d=N, 2 : underparameterized
+case = 0 # 0 : overparameterized, 1 : d=N, 2 : underparameterized
 path_figure_root_cv= 'convergence_linear_regression_'
 path_figure_root_racoga  = 'racoga_'
 if case == 0:

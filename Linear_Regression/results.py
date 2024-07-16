@@ -5,7 +5,7 @@ import numpy.random as nprandom
 from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
 ## Où importer les modules?
 
-d,N=10 ,500 #choice of dimension d, number of functions N
+d,N=1000 ,10 #choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
@@ -15,7 +15,7 @@ else:
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=3*10**3
+n_iter=3*10**2
 
 # gaussian features
 features_matrix,bias = features_gaussian(d,N)
@@ -38,8 +38,8 @@ else:
     L = nplinalg.eig(np.dot(features_matrix.T,features_matrix))[0].max()/N
 print("Conditionnement : ", mu/L)
 
-rho = np.array([0.8,1,1.2,1.5])*N/batch_size ## Overparameterized exemple value
-rho = np.array([0.01,0.1,1])*N/batch_size ## Underparameterized exemple value
+rho = np.array([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
+# rho = np.array([0.01,0.1,1])*N/batch_size ## Underparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 L_max = vec_norm.max()
