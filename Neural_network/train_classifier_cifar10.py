@@ -151,6 +151,7 @@ dict_results = {
 
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'
 torch.save(dict_results, save_name+'dict_results.pth')
+print("Model save in the adress : "+save_name+'dict_results.pth')
 
 plt.plot(loss_trajectory)
 plt.xlabel("number of iterations")
