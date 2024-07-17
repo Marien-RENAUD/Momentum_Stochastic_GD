@@ -21,6 +21,37 @@ def features_gaussian(d,N,mean,prompt_random_matrix = None,prompt_cov_matrix = N
         features_matrix = nprandom.multivariate_normal(mean,cov_matrix,N)
         return features_matrix,bias
     
+def features_gaussian_mixture(d,N,mean,mixture_prob):
+    nb_class = len(mixture_prob)
+    bias = nprandom.normal(np.zeros(N),N,N)
+    random_matrix = nprandom.uniform(-1,1,(nb_class,d,d))    
+    cov_matrix = np.matmul(random_matrix,random_matrix.transpose((0,2,1)))
+    vec = np.arange(nb_class)
+    sample = nprandom.choice(vec,p=mixture_prob,size = N)
+    features_matrix = np.empty((N,d))
+    k = 0
+    for i in range(nb_class):
+        nb_ind = len(np.where(sample==i)[0])
+        features_matrix[k:(k+nb_ind),:] = nprandom.multivariate_normal(mean[i],cov_matrix[i],nb_ind)
+        k += nb_ind
+    return features_matrix,bias
+
+def features_gaussian_mixture_det_rep(d,N,mean):
+    nb_class = len(mean[:,0])
+    if N/batch_size % 1 >0:
+        raise Exception("Please chose N and batch_size such that batch_size divide N") 
+    bias = nprandom.normal(np.zeros(N),N,(nb_class,N))
+    random_matrix = nprandom.uniform(-1,1,(nb_class,d,d))    
+    cov_matrix = np.matmul(random_matrix,random_matrix.transpose((0,2,1)))
+    features_matrix = np.empty((N,d))
+    rep_class = np.empty(nb_class)
+    k = 0
+    prop = int(N/nb_class)
+    for i in range(nb_class):
+        features_matrix[k:(k+prop),:] = nprandom.multivariate_normal(mean[i],cov_matrix[i],prop)
+        k += prop
+    return features_matrix,bias
+
 def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
     if prompt_lambda_vec == False:
         lambda_vec = rng.exponential(1,N)
@@ -50,6 +81,21 @@ def grad_sto_f(x,d,N,n_sample,batch_size,features_matrix,bias):
     vec = np.tile(np.arange(N),n_sample).reshape(n_sample,N)
     grad =np.moveaxis((np.dot(features_matrix,x)-bias.reshape(N,1)),0,1).reshape(n_sample,N,1)*features_matrix
     batch_index = rng.permuted(vec,axis=1)[:,:batch_size] 
+    gradient = np.take_along_axis(grad,batch_index.reshape(n_sample,batch_size,1),axis=1).mean(axis=1).reshape(n_sample,d).T
+    return gradient
+
+def grad_sto_f_batch_rep(x,d,N,n_sample,batch_size,features_matrix,bias,nb_class):
+    prop = int(N/nb_class)
+    k= 0
+    vec = np.arange(k,prop)
+    for i in range(1,nb_class):
+        k += prop
+        vec = np.vstack([vec,np.arange(k,k+ prop)])
+    vec_index = rng.permuted(vec,axis=1).transpose((1,0)).flatten()
+    for j in range(1,n_sample):
+        vec_index = np.vstack([vec_index,rng.permuted(vec,axis=1).transpose((1,0)).flatten()])
+    batch_index = vec_index[:,:batch_size] 
+    grad =np.moveaxis((np.dot(features_matrix,x)-bias.reshape(N,1)),0,1).reshape(n_sample,N,1)*features_matrix
     gradient = np.take_along_axis(grad,batch_index.reshape(n_sample,batch_size,1),axis=1).mean(axis=1).reshape(n_sample,d).T
     return gradient
 

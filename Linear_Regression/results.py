@@ -8,7 +8,7 @@ from linear_regression import * ## Il y a des problèmes dans le code, les promp
 version_bis = False # Set true to not overwrite the first data experiment
 ## data results folder
 
-d,N=50,50 #choice of dimension d, number of functions N
+d,N=500,15 #choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
@@ -17,23 +17,29 @@ else:
     case = 2  # 0 : overparameterized, 1 : d=N, 2 : underparameterized
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
-batch_size = 1 #size of batch
-n_iter=3*10**3
+batch_size = 3 #size of batch
+n_iter=1*10**3
 
 # gaussian features
 mean = np.ones(d)*10
 # mean = np.zeros(d)
 features_matrix,bias = features_gaussian(d,N,mean)
+# gaussian mixture features
+mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
+mixture_prob=np.array([0.1,0.3,0.6])
+features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N) 
 if case == 2:
     bias = np.zeros(N)
-if np.any(mean != np.zeros(d)):
-    biased_features = True
-else:
-    biased_features = False
+if len(mean.shape)== 1 and np.any(mean != np.zeros(d)): # 0 : unbiased, 1 : biased, 2 : mixture
+    features_type = 0
+elif len(mean.shape)== 1 :
+    features_type = 1
+else: 
+    features_type = 2
 x_0 = nprandom.normal(0,1,d)
-np.save("biased_features",biased_features)
+np.save("features_type",features_type)
 np.save("case",case)
 ## We compute L and mu using AA^T or AA^T, where A is the matrix feature, depending of which matrix is the largest
 ## and thus the easier to compute (the largest eigenvalue is the same for both cases)
@@ -49,7 +55,7 @@ print("Conditionnement : ", mu/L)
 
 rho = np.array([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
 if case== 2:
-    rho = np.array([0.01,0.1,1])*N/batch_size ## Underparameterized exemple value
+    rho = np.array([0.05,0.1,1])*N/batch_size ## Underparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 L_max = vec_norm.max()
@@ -73,26 +79,32 @@ root = "simul_data/"
 
 if case == 0:
     suffixe = 'overparameterized'
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
 elif case == 1:
     suffixe = 'd=N'
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
 else:
     suffixe = "underparameterized"
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
 print(suffixe)

@@ -8,20 +8,23 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 
 case = np.load("case.npy") # 0 : overparameterized, 1 : d=N, 2 : underparameterized
-biased_features = np.load("biased_features.npy") # True : biased features
-
-if biased_features == True:
+features_type = np.load("features_type.npy") # True : biased features
+if features_type == 0:
     path_figure_root= 'results/biased_features'
-else:
+elif features_type == 1:
     path_figure_root= 'results/unbiased_features'
+else:
+    path_figure_root = 'results/gaussian_mixture_features'
 
 
 if case == 0:
     suffixe = 'overparameterized'
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
     path_figure_cv = path_figure_root + '/overparameterized/convergence_linear_regression_' + suffixe + '.png'
@@ -31,10 +34,12 @@ if case == 0:
     racoga = np.load(root +"racoga_" + suffixe +".npy",allow_pickle=True).item()
 elif case == 1:
     suffixe = 'd=N'
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
     path_figure_cv = path_figure_root + '/d=N/convergence_linear_regression_' + suffixe + '.png'
@@ -44,10 +49,12 @@ elif case == 1:
     racoga = np.load(root +"racoga_" + suffixe +".npy",allow_pickle=True).item()
 else:
     suffixe = 'underparameterized'
-    if biased_features == True:
+    if features_type == 0 :
         suffixe += '_biased_features'
-    else:
+    elif features_type == 1 :
         suffixe += '_unbiased_features'
+    else:
+        suffixe += '_gaussian_mixture'
     if version_bis == True:
         suffixe += '_bis'
     path_figure_cv = path_figure_root +'/underparameterized/convergence_linear_regression_' + suffixe + '.png'
@@ -63,8 +70,8 @@ index = np.load(root + "index.npy")
 plt.figure(figsize=(20,10))
 nb_alg = len(labels) 
 nb_rho = len(param["rho"])
-nb_gd_eval = np.arange(0,n_iter+1,int(N/batch_size))
-
+nb_gd_eval_det = np.arange(0,(n_iter+1)*batch_size,N)
+nb_gd_eval_sto = np.arange(0,(n_iter)*batch_size,batch_size)
 
 racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max = np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg)
 k = 0
@@ -80,11 +87,11 @@ for j in range(nb_alg):
         k+=1
     if len(algo[index[j]].shape) >1:
         mean_alg,min_alg,max_alg = np.mean(algo[index[j]],axis=1),np.min(algo[index[j]],axis=1),np.max(algo[index[j]],axis=1)
-        plt.plot(np.log(mean_alg),label=labels[j],color =col,lw=2)
-        plt.plot(np.log(min_alg),color =col,linestyle ="--")
-        plt.plot(np.log(max_alg),color =col,linestyle ="--")
+        plt.plot(nb_gd_eval_sto,np.log(mean_alg),label=labels[j],color =col,lw=2)
+        plt.plot(nb_gd_eval_sto,np.log(min_alg),color =col,linestyle ="--")
+        plt.plot(nb_gd_eval_sto,np.log(max_alg),color =col,linestyle ="--")
     else:
-        plt.plot(nb_gd_eval,np.log(algo[index[j]]),label=labels[j],color =col,lw=2)
+        plt.plot(nb_gd_eval_det,np.log(algo[index[j]]),label=labels[j],color =col,lw=2)
     racoga_current = racoga[index[j]]
     racoga_mean[j],racoga_median[j], racoga_decile_inf[j], racoga_quantile_01[j], racoga_min[j], racoga_max[j] = racoga_current.mean(), np.quantile(racoga_current,0.5,method = 'nearest'), np.quantile(racoga_current,0.1,method = 'nearest'), np.quantile(racoga_current,0.01,method = 'nearest'), racoga_current.min(), racoga_current.max()
 vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max))
