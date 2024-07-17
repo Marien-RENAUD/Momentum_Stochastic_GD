@@ -12,14 +12,14 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
-parser.add_argument('--non_homogeneous', type=bool, default = False)
+parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
 
-non_homogeneous = hparams.non_homogeneous
+batch_sample = hparams.batch_sample
 network_type = hparams.network_type
 n_epoch = hparams.n_epoch
 
@@ -102,10 +102,10 @@ dict = {
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
 }
-save_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_racoga_results.npy'
-np.save(save_path, dict)
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'
+np.save(save_name+'racoga_results.npy', dict)
 
 plt.plot(iteration_list, racoga_list)
 plt.xlabel("number of iterations")
 plt.ylabel("RACOGA")
-plt.savefig(path_results+"RACOGA evolution.png")
+plt.savefig(save_name+"racoga_evolution.png")

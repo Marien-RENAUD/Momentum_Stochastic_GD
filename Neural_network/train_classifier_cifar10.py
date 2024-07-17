@@ -133,14 +133,8 @@ for i, (batch, targets) in enumerate(test_loader):
 print('End of testing. Test accuracy {:.2f}%'.format(
     100 * test_correct / (len(test_loader) * 64)))
 
-
 # Save the training loss
 path_results = "results/"
-
-plt.plot(loss_trajectory)
-plt.xlabel("number of iterations")
-plt.ylabel("Training Loss")
-plt.savefig(path_results+"Training_trajectory.png")
 
 # Save the training trajectory in a torch dictionary
 dict_results = {
@@ -155,5 +149,10 @@ dict_results = {
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
 
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_dict_results.pth'
-torch.save(dict_results, save_name)
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'
+torch.save(dict_results, save_name+'dict_results.pth')
+
+plt.plot(loss_trajectory)
+plt.xlabel("number of iterations")
+plt.ylabel("Training Loss")
+plt.savefig(save_name+"Training_trajectory.png")
