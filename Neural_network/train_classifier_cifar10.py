@@ -13,7 +13,7 @@ import itertools
 
 # Define Parser arguments
 parser = ArgumentParser()
-parser.add_argument('--network_type', type=str, default = "CNN")
+parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
 parser.add_argument('--non_homogeneous', type=bool, default = False)
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
@@ -24,7 +24,7 @@ device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() e
 # define network structure 
 network_type = hparams.network_type
 
-if network_type == "mlp":# MLP architecture
+if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
 if network_type == "CNN":# Light CNN architecture

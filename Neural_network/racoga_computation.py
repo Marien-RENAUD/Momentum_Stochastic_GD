@@ -8,16 +8,24 @@ import numpy as np
 from time import time
 from tqdm import tqdm
 from models_architecture import create_mlp, create_cnn
+from argparse import ArgumentParser
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+parser = ArgumentParser()
+parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
+parser.add_argument('--non_homogeneous', type=bool, default = False)
+parser.add_argument('--device', type=int, default = 0)
+parser.add_argument('--n_epoch', type=int, default = 5)
+hparams = parser.parse_args()
 
-non_homogeneous = False
-network_type = "CNN"
-n_epoch = 1
+device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
+
+non_homogeneous = hparams.non_homogeneous
+network_type = hparams.network_type
+n_epoch = hparams.n_epoch
 
 # define network structure 
 
-if network_type == "mlp":# MLP architecture
+if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
 if network_type == "CNN":# Light CNN architecture
