@@ -13,6 +13,8 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 non_homogeneous = False
 network_type = "CNN"
+n_epoch = 1
+
 # define network structure 
 
 if network_type == "mlp":# MLP architecture
@@ -33,7 +35,6 @@ train_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochast
 
 # Load results
 path_results = "results/"
-n_epoch = 8
 dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_dict_results.pth'
 if non_homogeneous:
     dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_nonhomogeneous_dict_results.pth'
@@ -48,7 +49,7 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 ###
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 
-step = 100
+step = 100 # interval between each RACOGA computation
 racoga_list = []
 scalar_prod_list = []
 iteration_list = []

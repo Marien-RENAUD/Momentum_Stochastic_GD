@@ -49,7 +49,7 @@ train_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochast
 test_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochastic_GD/dataset', train=False, transform=transform_list, download=True)
 
 batch_size = 64
-train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)#, sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
+train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size)
 
 def get_batch_direct(dataloader, i):
