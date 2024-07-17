@@ -27,7 +27,11 @@ features_matrix,bias = features_gaussian(d,N,mean)
 # gaussian mixture features
 mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
 mixture_prob=np.array([0.1,0.3,0.6])
+N = 99
 features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)
+print(features_matrix)
+exit() 
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N) 
 if case == 2:
