@@ -9,12 +9,12 @@ from time import time
 from tqdm.auto import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
-import itertools
+from utils import *
 
 # Define Parser arguments
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
-parser.add_argument('--non_homogeneous', type=bool, default = False)
+parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 hparams = parser.parse_args()
@@ -52,21 +52,13 @@ batch_size = 64
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size)
 
-def get_batch_direct(dataloader, i):
-    """
-    Get the batch of index i of the dataloader
-    """
-    return next(itertools.islice(dataloader, i, None))
-
 # To obtain non-homogeneous batches: batches that are composed of one class.
-non_homogeneous = hparams.non_homogeneous
-if non_homogeneous:
+batch_sample = hparams.batch_sample
+if batch_sample == "sort":
     batch_sort = [[] for i in range(10)]
     targets_sort = [[] for i in range(10)]
     num_im = 0
-    for _ in tqdm(range(len(train_loader))):
-        i = np.random.randint(len(train_loader))
-        batch, targets = get_batch_direct(train_loader, i)
+    for i, (batch, targets) in enumerate(train_loader):
         index_sort = np.argsort(targets)
         batch_sort_i = batch[index_sort]
         targets_sort_i = targets[index_sort]
@@ -107,7 +99,11 @@ for epoch in range(n_epoch): # training loop
     
     # loop per epoch
     for i, (batch, targets) in enumerate(train_loader):
-        if non_homogeneous:
+        if batch_sample == "random_with_rplm":
+            i = np.random.randint(len(train_loader))
+            batch, targets = get_batch_direct(train_loader, i)
+
+        if batch_sample == "sort":
             if i >= len(batch_shuffle):
                 break
             batch = batch_shuffle[i].to(device)
@@ -117,7 +113,7 @@ for epoch in range(n_epoch): # training loop
             batch_size = batch.size()[0]
             batch = batch.view((batch_size, 3, 32, 32))
         output = net(batch)
-        if non_homogeneous:
+        if batch_sample == "sort":
             targets = targets_shuffle[i].to(device)
         else:
             targets =targets.to(device)
@@ -173,7 +169,7 @@ dict_results = {
     "weights_trajectory" : weights_trajectory,
     "loss_trajectory" : loss_trajectory,
     "network_type"  : network_type,
-    "non_homogeneous" : non_homogeneous,
+    "batch_sample" : batch_sample,
     "n_epoch" : n_epoch,
     "batch_size" : batch_size,
     "momentum" : momentum,
@@ -181,7 +177,5 @@ dict_results = {
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
 
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_dict_results.pth'
-if non_homogeneous:
-    save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_nonhomogeneous_dict_results.pth'
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'dict_results.pth'
 torch.save(dict_results, save_name)
