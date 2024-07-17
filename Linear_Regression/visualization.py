@@ -4,7 +4,7 @@ import pandas as pd
 import os as os
 print(os.getcwd() )
 
-version_bis = False # Set true to not overwrite the first experiment
+version_bis = True # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 
 case = np.load("case.npy") # 0 : overparameterized, 1 : d=N, 2 : underparameterized

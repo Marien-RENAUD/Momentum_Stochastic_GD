@@ -38,9 +38,9 @@ def features_gaussian_mixture(d,N,mean,mixture_prob):
 
 def features_gaussian_mixture_det_rep(d,N,mean):
     nb_class = len(mean[:,0])
-    if N/batch_size % 1 >0:
-        raise Exception("Please chose N and batch_size such that batch_size divide N") 
-    bias = nprandom.normal(np.zeros(N),N,(nb_class,N))
+    if N/nb_class % 1 >0:
+        raise Exception("Please chose N and number of cluster such that number of cluster divide N") 
+    bias = nprandom.normal(np.zeros(N),N,N)
     random_matrix = nprandom.uniform(-1,1,(nb_class,d,d))    
     cov_matrix = np.matmul(random_matrix,random_matrix.transpose((0,2,1)))
     features_matrix = np.empty((N,d))
@@ -126,7 +126,7 @@ def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
     else:
         return f_GD
 
-def SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False):
+def SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None):
     x_SGD = np.empty((n_iter,d,n_sample))
     f_SGD = np.empty((n_iter,n_sample))
 
@@ -143,7 +143,10 @@ def SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_ini
     step = 1/L_sgd
 
     for i in range(n_iter-1):
-        gradient_sto = grad_sto_f(x_SGD[i,:,:],d,N,n_sample,batch_size,features_matrix,bias)
+        if alternative_sampling == False:
+            gradient_sto = grad_sto_f(x_SGD[i,:,:],d,N,n_sample,batch_size,features_matrix,bias)
+        else:
+            gradient_sto = grad_sto_f_batch_rep(x_SGD[i,:,:],d,N,n_sample,batch_size,features_matrix,bias,nb_class)
         if return_racoga == True:
             racoga[i] = racoga_computation(x_SGD[i,:,0],N,features_matrix,bias)
         x_SGD[i+1,:,:] = x_SGD[i,:,:] - step*gradient_sto

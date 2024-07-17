@@ -5,10 +5,10 @@ import numpy.random as nprandom
 from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
 ## Où importer les modules?
 
-version_bis = False # Set true to not overwrite the first data experiment
+version_bis = True # Set true to not overwrite the first data experiment
 ## data results folder
 
-d,N=500,15 #choice of dimension d, number of functions N
+d,N=100,33 #choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
@@ -26,12 +26,11 @@ mean = np.ones(d)*10
 features_matrix,bias = features_gaussian(d,N,mean)
 # gaussian mixture features
 mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
+nb_class = len(mean[:,0])
 mixture_prob=np.array([0.1,0.3,0.6])
-N = 99
 features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)
-print(features_matrix)
-exit() 
+
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N) 
 if case == 2:
@@ -68,12 +67,12 @@ labels = ["GD", "Mean-SGD", "NAG"]
 
 f_nag,racoga_nag = NAG(x_0,mu,L,int(n_iter*batch_size/N)+1,d,N,features_matrix,bias,return_racoga = True)
 f_gd,racoga_gd = GD(x_0,L,int(n_iter*batch_size/N)+1,d,N,features_matrix,bias,return_racoga = True)
-f_sgd,racoga_sgd = SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True)
+f_sgd,racoga_sgd = SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
 algo = {'gd' : f_gd,'sgd' : f_sgd,'nag' : f_nag}
 racoga = {'gd' : racoga_gd,'sgd' : racoga_sgd,'nag' : racoga_nag}
 index = ["gd","sgd","nag"]
 for i in range(len(rho)):  
-    f_snag,b = SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True)
+    f_snag,b = SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
     racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
     algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
     labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
