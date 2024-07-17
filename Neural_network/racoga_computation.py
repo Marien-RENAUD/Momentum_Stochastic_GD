@@ -15,6 +15,7 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
+parser.add_argument('--step', type=int, default = 100)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -43,9 +44,7 @@ train_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochast
 
 # Load results
 path_results = "results/"
-dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_dict_results.pth'
-if non_homogeneous:
-    dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_nonhomogeneous_dict_results.pth'
+dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]
@@ -57,7 +56,7 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 ###
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 
-step = 100 # interval between each RACOGA computation
+step = hparams.step # interval between each RACOGA computation
 racoga_list = []
 scalar_prod_list = []
 iteration_list = []
