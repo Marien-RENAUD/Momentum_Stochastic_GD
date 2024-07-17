@@ -184,7 +184,7 @@ def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
         return f_nag
 
     
-def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False):
+def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None):
 
     x_snag = np.empty((n_iter,d,n_sample))
     y_snag = np.empty((n_iter,d,n_sample))
@@ -213,7 +213,10 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
     beta = 1-np.sqrt( (mu/L) )/rho
     alpha = 1/(1+(1/rho)*np.sqrt(mu/L))
     for i in range(1,n_iter):
-        gradient_sto = grad_sto_f(y_snag[i-1,:,:],d,N,n_sample,batch_size,features_matrix,bias)
+        if alternative_sampling == False:
+            gradient_sto = grad_sto_f(y_snag[i-1,:,:],d,N,n_sample,batch_size,features_matrix,bias)
+        else:
+            gradient_sto = grad_sto_f_batch_rep(y_snag[i-1,:,:],d,N,n_sample,batch_size,features_matrix,bias,nb_class)
         if return_racoga == True:
             racoga[i-1] = racoga_computation(y_snag[i-1,:,0],N,features_matrix,bias)
         x_snag[i,:,:] = y_snag[i-1,:,:] - step*gradient_sto
