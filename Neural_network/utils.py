@@ -1,18 +1,17 @@
 import itertools
 import numpy as np
 import torch
-
-def get_batch_direct(dataloader, i):
-    """
-    Get the batch of index i of the dataloader
-    """
-    return next(itertools.islice(dataloader, i, None))
+from tqdm.auto import tqdm
 
 def sort_batches(train_loader, batch_size, device):
+    """
+    Take batches of the train_loader and generate batches with only one class inside and 
+    sort batches by their class.
+    """
     batch_sort = [[] for i in range(10)]
     targets_sort = [[] for i in range(10)]
     num_im = 0
-    for i, (batch, targets) in enumerate(train_loader):
+    for i, (batch, targets) in tqdm(enumerate(train_loader)):
         index_sort = np.argsort(targets)
         batch_sort_i = batch[index_sort]
         targets_sort_i = targets[index_sort]
@@ -34,3 +33,4 @@ def sort_batches(train_loader, batch_size, device):
     batch_shuffle = np.array(batch_shuffle)
     batch_shuffle = torch.tensor(batch_shuffle).to(device)
     targets_shuffle = torch.tensor(targets_shuffle).to(device)
+    return batch_shuffle, targets_shuffle

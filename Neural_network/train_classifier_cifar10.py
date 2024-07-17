@@ -9,7 +9,7 @@ from time import time
 from tqdm.auto import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
-from utils import get_batch_direct, sort_batches
+from utils import sort_batches
 
 # Define Parser arguments
 parser = ArgumentParser()
@@ -56,7 +56,8 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size)
 batch_sample = hparams.batch_sample
 if batch_sample == "sort":
     batch_shuffle, targets_shuffle = sort_batches(train_loader, batch_size, device)
-
+if batch_sample == "random_with_rpl":
+    data_list = list(train_loader)
 ###
 # TRAINING
 ###
@@ -75,9 +76,8 @@ for epoch in range(n_epoch): # training loop
     
     # loop per epoch
     for i, (batch, targets) in enumerate(train_loader):
-        if batch_sample == "random_with_rplm":
-            i = np.random.randint(len(train_loader))
-            batch, targets = get_batch_direct(train_loader, i)
+        if batch_sample == "random_with_rpl":
+            batch, targets = data_list[i]
             batch = batch.to(device)
         elif batch_sample == "sort":
             if i >= len(batch_shuffle):
@@ -155,5 +155,5 @@ dict_results = {
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
 
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'dict_results.pth'
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_dict_results.pth'
 torch.save(dict_results, save_name)
