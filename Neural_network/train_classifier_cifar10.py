@@ -14,7 +14,7 @@ from utils import sort_batches
 # Define Parser arguments
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
-parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
+parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 hparams = parser.parse_args()
@@ -54,9 +54,9 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size)
 
 # To obtain non-homogeneous batches: batches that are composed of one class.
 batch_sample = hparams.batch_sample
-if batch_sample == "sort":
+if batch_sample == "sort" or batch_sample == "random_sort":
     batch_shuffle, targets_shuffle = sort_batches(train_loader, batch_size, device)
-if batch_sample == "random_with_rpl":
+if batch_sample == "random_with_rpl" or batch_sample == "random_sort":
     data_list = list(train_loader)
 ###
 # TRAINING
@@ -77,24 +77,23 @@ for epoch in range(n_epoch): # training loop
     # loop per epoch
     for i, (batch, targets) in enumerate(train_loader):
         if batch_sample == "random_with_rpl":
+            i = np.random.randint(len(data_list))
             batch, targets = data_list[i]
-            batch = batch.to(device)
+            batch, targets = batch.to(device), targets.to(device)
         elif batch_sample == "sort":
             if i >= len(batch_shuffle):
                 break
-            batch = batch_shuffle[i].to(device)
+            batch, targets = batch_shuffle[i].to(device), targets_shuffle[i].to(device)
+        elif batch_sample == "random_sort":
+            i = np.random.randint(len(data_list))
+            batch, targets = batch_shuffle[i].to(device), targets_shuffle[i].to(device)
         else:
-            batch = batch.to(device)
+            batch, targets = batch.to(device), targets.to(device)
         
         if network_type == "CNN":
             batch_size = batch.size()[0]
             batch = batch.view((batch_size, 3, 32, 32))
-        output = net(batch)
-
-        if batch_sample == "sort":
-            targets = targets_shuffle[i].to(device)
-        else:
-            targets =targets.to(device)
+        output = net(batch)            
         
         loss = criterion(output, targets)
         optimizer.zero_grad()
@@ -156,4 +155,4 @@ print("Model save in the adress : "+save_name+'dict_results.pth')
 plt.plot(loss_trajectory)
 plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
-plt.savefig(save_name+"Training_trajectory.png")
+plt.savefig(save_name+"training_trajectory.png")
