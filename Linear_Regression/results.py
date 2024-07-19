@@ -1,14 +1,14 @@
 import numpy as np
 import numpy.linalg as nplinalg
 import numpy.random as nprandom
-
+import matplotlib.pyplot as plt
 from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
 ## Où importer les modules?
 
 version_bis = False # Set true to not overwrite the first data experiment
 ## data results folder
 
-d,N=200,50#choice of dimension d, number of functions N
+d,N=200,10#choice of dimension d, number of functions N
 if d>N:
     case = 0
 elif d == N:
@@ -17,25 +17,29 @@ else:
     case = 2  # 0 : overparameterized, 1 : d=N, 2 : underparameterized
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
-batch_size = 10 #size of batch
-n_iter=1*10**3
+batch_size = 1 #size of batch
+n_iter=1*10**4
 
 # gaussian features
-mean = np.ones(d)*10
-# mean = np.zeros(d)
+# mean = np.ones(d)*10
+mean = np.zeros(d)
 features_matrix,bias = features_gaussian(d,N,mean)
+for j in range(1):
+    features_matrix[j,:] /= 10**1
 # gaussian mixture features
 nb_class = 10
-mean = nprandom.uniform(-d,d,(nb_class,d))
-print(np.std(mean))
-# mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
-nb_class = len(mean[:,0])
-mixture_prob=np.array([0.1,0.3,0.6])
-# features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
-features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)
+# mean = nprandom.uniform(-d,d,(nb_class,d))
+# print(np.std(mean))
+# # mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
+# nb_class = len(mean[:,0])
+# mixture_prob=np.array([0.1,0.3,0.6])
+# # features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+# features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)
 
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N) 
+# bias = np.zeros(N)
+
 if case == 2:
     bias = np.zeros(N)
 if len(mean.shape)== 1 and np.any(mean != np.zeros(d)): # 0 : unbiased, 1 : biased, 2 : mixture
@@ -59,11 +63,15 @@ else:
     L = nplinalg.eig(np.dot(features_matrix.T,features_matrix))[0].max()/N
 print("Conditionnement : ", mu/L)
 
-rho = np.array([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
+rho = np.array([0.8,1])*N/batch_size ## Overparameterized exemple value
 if case== 2:
     rho = np.array([0.05,0.1,1])*N/batch_size ## Underparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
+print(np.sort(vec_norm))
+print(np.mean(vec_norm))
+print("angle a_i : ", np.sum(features_matrix[0,:]*features_matrix[1,:])/np.sqrt((np.sum(features_matrix[0,:]**2)*np.sum(features_matrix[1,:]**2))))
+arg_L_max = np.argmax(vec_norm) 
 L_max = vec_norm.max()
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
 labels = ["GD", "Mean-SGD", "NAG"]
@@ -74,25 +82,26 @@ f_sgd,racoga_sgd = SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,
 algo = {'gd' : f_gd,'sgd' : f_sgd,'nag' : f_nag}
 racoga = {'gd' : racoga_gd,'sgd' : racoga_sgd,'nag' : racoga_nag}
 index = ["gd","sgd","nag"]
-# for i in range(len(rho)):  
-#     f_snag,b = SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
-#     racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-#     algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-#     labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-#     index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
-i=0
-rho = np.array([0.5,1])*N/batch_size
-f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
-racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
-i=1
-f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
-racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
+f_i = np.empty((n_iter,len(rho)))
+for i in range(len(rho)):  
+    f_snag,b,f_i[:,i] = SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class,arg_L_max = arg_L_max)
+    racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
+    algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
+    labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
+    index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
+# i=0
+# rho = np.array([0.5,1])*N/batch_size
+# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
+# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
+# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
+# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
+# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
+# i=1
+# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
+# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
+# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
+# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
+# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
 
 
 root = "simul_data/" 
@@ -135,4 +144,9 @@ np.save(root +"racoga_"+suffixe,racoga)
 np.save(root +"labels",np.array(labels))
 np.save(root +"index",np.array(index))
 
+for i in range(len(rho)):
+    plt.plot(np.log(f_i[:,i]),label = "rho" + str(batch_size*rho[i]/N))
+
+plt.legend()
+plt.show()
 exec(open('visualization.py').read()) 

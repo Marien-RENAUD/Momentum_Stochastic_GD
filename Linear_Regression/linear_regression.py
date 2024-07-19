@@ -10,8 +10,8 @@ def features_gaussian(d,N,mean,prompt_random_matrix = None,prompt_cov_matrix = N
         bias = nprandom.normal(nprandom.uniform(-N,N),N,N)
     if prompt_cov_matrix != None:
         cov_matrix = prompt_cov_matrix
-        features_matrix = nprandom.multivariate_normal(mean,Cov_matrix,N)
-        return features_matrix,b
+        features_matrix = nprandom.multivariate_normal(mean,cov_matrix,N)
+        return features_matrix,bias
     else:
         if prompt_random_matrix != None:
             random_matrix = prompt_random_matrix
@@ -55,6 +55,7 @@ def features_gaussian_mixture_det_rep(d,N,mean):
 def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
     if prompt_lambda_vec == False:
         lambda_vec = rng.exponential(1,N)
+        lambda_vec = np.array([0.001,1])
     else:
         lambda_vec = prompt_lambda_vec
     features_matrix = np.eye(N,d)*lambda_vec.reshape(N,1)
@@ -64,6 +65,9 @@ def features_orthogonal(d,N,prompt_lambda_vec = False, prompt_bias = None):
 
 def f(x,features_matrix,bias):
     return 0.5*np.mean((np.dot(features_matrix,x)-bias)**2)
+
+def f_i(x,index,features_matrix,bias):
+    return 0.5*((np.dot(features_matrix[index,:],x)-bias[index])**2)
 
 def f_sample(x,N,features_matrix,bias):
     return  0.5*( np.mean((np.dot(features_matrix,x)-bias.reshape(N,1))**2,axis = 0))
@@ -187,13 +191,13 @@ def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
         return f_nag
 
     
-def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None):
+def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None,arg_L_max = None):
 
     x_snag = np.empty((n_iter,d,n_sample))
     y_snag = np.empty((n_iter,d,n_sample))
     z_snag =  np.empty((n_iter,d,n_sample))
     f_snag =  np.empty((n_iter,n_sample))
-
+    f_L_max = np.empty(n_iter)
     if return_racoga == True:
         racoga = np.empty(n_iter-1)
 
@@ -209,7 +213,7 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
         y_snag[0,:,:] = x_0
         z_snag[0,:,:] =  x_0
         f_snag[0,:] =  f_sample(x_0,N,features_matrix,bias)
-
+    f_L_max[0] = f_i(x_0,arg_L_max,features_matrix,bias)
     # Params
     step = 1/(L*rho)
     eta = 1/(np.sqrt(mu*L)*rho)
@@ -227,7 +231,8 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
         y_snag[i,:,:] = z_snag[i,:,:]*(1-alpha) + (alpha)*x_snag[i,:,:]
 
         f_snag[i,:] =f_sample(x_snag[i,:],N,features_matrix,bias)
-
+        f_L_max[i] = f_i( x_snag[i,:,0],arg_L_max,features_matrix,bias)
+    return f_snag,racoga,f_L_max
     if return_racoga == True:
         return f_snag,racoga
     else:
