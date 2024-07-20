@@ -77,24 +77,25 @@ for epoch in range(n_epoch): # training loop
     # loop per epoch
     for i, (batch, targets) in enumerate(train_loader):
         if batch_sample == "random_with_rpl":
-            i = np.random.randint(len(data_list))
-            batch, targets = data_list[i]
+            j = np.random.randint(len(data_list))
+            batch, targets = data_list[j]
             batch, targets = batch.to(device), targets.to(device)
         elif batch_sample == "sort":
             if i >= len(batch_shuffle):
                 break
             batch, targets = batch_shuffle[i].to(device), targets_shuffle[i].to(device)
         elif batch_sample == "random_sort":
-            i = np.random.randint(len(data_list))
-            batch, targets = batch_shuffle[i].to(device), targets_shuffle[i].to(device)
+            j = np.random.randint(len(batch_shuffle))
+            # print(j)
+            batch, targets = batch_shuffle[j].to(device), targets_shuffle[j].to(device)
         else:
             batch, targets = batch.to(device), targets.to(device)
         
         if network_type == "CNN":
             batch_size = batch.size()[0]
             batch = batch.view((batch_size, 3, 32, 32))
-        output = net(batch)            
-        
+
+        output = net(batch)
         loss = criterion(output, targets)
         optimizer.zero_grad()
         loss.backward()
@@ -106,11 +107,12 @@ for epoch in range(n_epoch): # training loop
         loss_trajectory.append(loss.item())
 
         pred = output.max(1, keepdim=True)[1]
+        # print(pred)
         train_correct += pred.eq(targets.view_as(pred)).sum().item()
         train_loss += loss
 
         if i % 100 == 10: print('Train loss {:.4f}, Train accuracy {:.2f}%'.format(
-            train_loss / ((i+1) * 64), 100 * train_correct / ((i+1) * 64)))
+            train_loss / ((i+1) * batch_size), 100 * train_correct / ((i+1) * batch_size)))
         
 print('End of training.\n')
     
