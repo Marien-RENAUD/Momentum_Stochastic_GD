@@ -10,16 +10,17 @@ version_bis = False # Set true to not overwrite the first data experiment
 alternative_sampling = False
 ## data results folder
 
-d,N=100,50#choice of dimension d, number of functions N
+d,N=1000,100#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = torch.tensor([1,int(N/10),int(N/2)]) #size of batch
-rho = 1*N/batch_size
-n_iter=1*10**3
+rho = 0.1*N/batch_size
+rho = torch.tensor([0.06,0.1,0.5])*N/batch_size
+n_iter=1*10**4
 
 # gaussian features
 # mean = np.ones(d)*10
-mean = torch.zeros(d)
+mean = torch.ones(d)*1000
 features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
 # for j in range(1):
 #     features_matrix[j,:] /= 10**1
@@ -28,17 +29,17 @@ nb_class = 10
 # mean = nprandom.uniform(-d,d,(nb_class,d))
 # print(np.std(mean))
 # # mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
-mean = torch.rand(nb_class,d) * 2 * d - d # random
 
-# nb_class = len(mean[:,0])
-if alternative_sampling == True:
-    features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-else:
-    mixture_prob=np.array([0.1,0.9])
-    nb_class = 10
-    mixture_prob = np.ones(nb_class)/nb_class
-    # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-    features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+# mean = torch.rand(nb_class,d) * 2 * d - d # random
+# # nb_class = len(mean[:,0])
+# if alternative_sampling == True:
+#     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+# else:
+#     mixture_prob=np.array([0.1,0.9])
+#     nb_class = 10
+#     mixture_prob = np.ones(nb_class)/nb_class
+#     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+#     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
 # Orthogonal features
 # features_matrix,bias = features_orthogonal(d,N) 

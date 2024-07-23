@@ -60,10 +60,12 @@ for j in range(nb_alg):
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
         plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
         plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
+        racoga_current = (racoga[index[j]] + (batch_size[ind_batch]-1)*(N - racoga[index[j]])/(N-1))/batch_size[ind_batch]
         ind_batch += 1
+
     else:
         plt.plot(nb_gd_eval_det,torch.log(algo[index[j]]),label=labels[j],color =col,lw=2)
-    racoga_current = racoga[index[j]]
+        racoga_current = racoga[index[j]]
     racoga_mean[j],racoga_median[j], racoga_decile_inf[j], racoga_quantile_01[j], racoga_min[j], racoga_max[j] = racoga_current.mean(), np.quantile(racoga_current,0.5,method = 'nearest'), np.quantile(racoga_current,0.1,method = 'nearest'), np.quantile(racoga_current,0.01,method = 'nearest'), racoga_current.min(), racoga_current.max()
 vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max))
 df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
@@ -93,7 +95,8 @@ min_racoga, max_racoga = racoga[index[3]].min(), racoga[index[3]].max()
 
 for j in range(nb_rho):
     col = (0.5, j/nb_rho ,1-j/nb_rho)
-    plt.plot(racoga[index[j+3]],label = labels[j+3],color=col)
+    racog = (racoga[index[j+3]] + (batch_size[j]-1)*(N - racoga[index[j+3]])/(N-1))/batch_size[j]
+    plt.plot(racog,label = labels[j+3],color=col)
     min_racoga, max_racoga = min(min_racoga, racoga[index[j+3]].min()), max(max_racoga, racoga[index[j+3]].max())
 plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
 plt.yticks((min_racoga,0,max_racoga))
