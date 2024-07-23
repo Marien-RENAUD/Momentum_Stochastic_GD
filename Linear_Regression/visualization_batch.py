@@ -6,19 +6,21 @@ import os as os
 print(os.getcwd() )
 
 version_bis = False # Set true to not overwrite the first experiment
-root = "simul_data/" # Data results folder
-nb_rho = np.load("nb_rho.npy")
+root = "simul_data/batch_" # Data results folder
+nb_batch = np.load("nb_batch.npy")
 features_type = np.load("features_type.npy") # True : biased features
-if features_type == 0 :
-    path_figure_root= 'results/unbiased_features/'
-    suffixe = 'unbiased_'
-else :
-    path_figure_root = 'results/gaussian_mixture/'
-    suffixe = 'gaussian_mixture_'
 
-param= torch.load(root +"param_" + suffixe + 'rho='+ str(nb_rho) + ".pth")
-algo = torch.load(root +"algo_" + suffixe + 'rho='+ str(nb_rho) + ".pth")
-racoga = torch.load(root +"racoga_" + suffixe + 'rho='+ str(nb_rho) + ".pth")
+path_figure_root = 'results/batch/'
+if features_type == 0 :
+    suffixe = 'unbiased_'
+elif features_type == 1 :
+    suffixe = 'gaussian_mixture_'
+else:
+    suffixe = 'alternative_sampling_'
+
+param= torch.load(root +"param_" + suffixe + "batch=" + str(nb_batch) + ".pth")
+algo = torch.load(root +"algo_" + suffixe + "batch=" + str(nb_batch) + ".pth")
+racoga = torch.load(root +"racoga_" + suffixe + "batch=" + str(nb_batch) + ".pth")
 path_figure_cv = path_figure_root + 'convergence/d=' + str(param['d']) + '_N=_' + str(param['N']) + suffixe + '.png'
 path_figure_racoga = path_figure_root + "racoga/" + '_d=' + str(param['d']) + '_N=_' + str(param['N']) + suffixe + '.png'
 
@@ -26,16 +28,17 @@ path_figure_racoga = path_figure_root + "racoga/" + '_d=' + str(param['d']) + '_
 
 d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"], param["batch_size"], param["mu"], param["L"], param["L_max"]
 
-labels = torch.load(root + "labels_rho="+ str(nb_rho) + ".pth")
-index = torch.load(root + "index_rho="+ str(nb_rho) + ".pth")
+labels = torch.load(root + "labels_" + "batch=" + str(nb_batch) + ".pth")
+index = torch.load(root + "index_"+  "batch=" + str(nb_batch) +".pth")
 plt.figure(figsize=(20,10))
 nb_alg = len(labels) 
 nb_rho = len(param["rho"])
-nb_gd_eval_det = torch.arange(0,(n_iter+1)*batch_size,N)
-nb_gd_eval_sto = torch.arange(0,(n_iter)*batch_size,batch_size)
+nb_gd_eval_det = torch.arange(0,(n_iter+1)*int(batch_size[0]),N)
 
+print(batch_size)
 racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max = np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg)
 k = 0
+ind_batch = 0
 for j in range(nb_alg):
     if j==0:
         col = "black"
@@ -47,10 +50,17 @@ for j in range(nb_alg):
         col = (0.25, k/nb_rho ,1-k/nb_rho)
         k+=1
     if len(algo[index[j]].shape) >1:
-        mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)
+        print("j = ", j)
+        if j == 1:
+            nb_gd_eval_sto = torch.arange(0,(n_iter),batch_size[0])
+            ind_batch-=1
+        else:
+            nb_gd_eval_sto = torch.arange(0,int((n_iter)*batch_size[0]),int(batch_size[ind_batch]))
+        mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)    
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
         plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
         plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
+        ind_batch += 1
     else:
         plt.plot(nb_gd_eval_det,torch.log(algo[index[j]]),label=labels[j],color =col,lw=2)
     racoga_current = racoga[index[j]]
