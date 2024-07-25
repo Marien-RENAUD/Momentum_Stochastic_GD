@@ -10,13 +10,13 @@ version_bis = False # Set true to not overwrite the first data experiment
 alternative_sampling = False
 ## data results folder
 
-d,N=1000,100#choice of dimension d, number of functions N
+d,N=1000,1000#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = torch.tensor([1,int(N/10),int(N/2)]) #size of batch
 rho = 0.1*N/batch_size
-rho = torch.tensor([0.06,0.1,0.5])*N/batch_size
-n_iter=1*10**4
+rho = torch.tensor([1,1,1])*N/batch_size
+n_iter=3*10**3
 
 # gaussian features
 # mean = np.ones(d)*10
@@ -42,8 +42,8 @@ nb_class = 10
 #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
 # Orthogonal features
-# features_matrix,bias = features_orthogonal(d,N) 
-# bias = torch.zeros(N)
+features_matrix,bias = features_orthogonal(d,N) 
+bias = torch.zeros(N)
 
 if len(mean.shape)== 1: # 0 : unbiased, 2 : mixture
     features_type = 0
@@ -68,15 +68,16 @@ else:
 print("Conditionnement : ", mu/L)
 
 vec_norm= (features_matrix**2).sum(axis=1)
-print(torch.sort(vec_norm))
-print(torch.mean(vec_norm))
-print("angle a_i : ", torch.sum(features_matrix[0,:]*features_matrix[1,:])/torch.sqrt((torch.sum(features_matrix[0,:]**2)*torch.sum(features_matrix[1,:]**2))))
+# print("angle a_i : ", torch.sum(features_matrix[0,:]*features_matrix[1,:])/torch.sqrt((torch.sum(features_matrix[0,:]**2)*torch.sum(features_matrix[1,:]**2))))
 arg_L_max = torch.argmax(vec_norm) 
 L_max = torch.max(vec_norm)
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
 labels = ["GD", "Mean-SGD", "NAG"]
+print("NAG")
 f_nag,racoga_nag = NAG(x_0,mu,L,int(n_iter*batch_size[0]/N)+1,d,N,features_matrix,bias,return_racoga = True)
+print("GD")
 f_gd,racoga_gd = GD(x_0,L,int(n_iter*batch_size[0]/N)+1,d,N,features_matrix,bias,return_racoga = True)
+print("SGD")
 f_sgd,racoga_sgd = SGD(x_0,L_sgd[0],n_iter,n_sample,d,batch_size[0],N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
 algo = {'gd' : f_gd,'sgd' : f_sgd,'nag' : f_nag}
 racoga = {'gd' : racoga_gd,'sgd' : racoga_sgd,'nag' : racoga_nag}
@@ -85,13 +86,15 @@ index = ["gd","sgd","nag"]
 nb_rho = len(rho)
 
 f_i = np.empty((n_iter,nb_rho))
+print("Debut SNAG")
 for i in range(nb_rho):  
-    f_snag,b= SNAG(x_0,mu,L,rho[i],int(n_iter*batch_size[0]/batch_size[i]),n_sample,d,batch_size[i],N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
+    f_snag,b= SNAG(x_0,mu,L,rho[i],int(n_iter*batch_size[0]/batch_size[i])+1,n_sample,d,batch_size[i],N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
+    print(f_snag.shape)
     racoga['snag' + "batchsize=" + str(int(batch_size[i]))] = b 
     algo['snag' + "batchsize=" + str(int(batch_size[i]))] = f_snag
-    print(str(int(batch_size[i])))
     labels.append("batchsize=" + str(int(batch_size[i])))
     index.append('snag' + "batchsize=" + str(int(batch_size[i])))
+    print("SNAG", i)
 # i=0
 # rho = np.array([0.5,1])*N/batch_size
 # f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)

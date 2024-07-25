@@ -50,12 +50,12 @@ for j in range(nb_alg):
         col = (0.25, k/nb_rho ,1-k/nb_rho)
         k+=1
     if len(algo[index[j]].shape) >1:
-        print("j = ", j)
         if j == 1:
             nb_gd_eval_sto = torch.arange(0,(n_iter),batch_size[0])
             ind_batch-=1
         else:
-            nb_gd_eval_sto = torch.arange(0,int((n_iter)*batch_size[0]),int(batch_size[ind_batch]))
+            nb_gd_eval_sto = torch.arange(0,int((n_iter+1)*batch_size[0]),int(batch_size[ind_batch]))
+        print(nb_gd_eval_sto)
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)    
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
         plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
