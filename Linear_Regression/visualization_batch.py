@@ -35,7 +35,6 @@ nb_alg = len(labels)
 nb_rho = len(param["rho"])
 nb_gd_eval_det = torch.arange(0,(n_iter+1)*int(batch_size[0]),N)
 
-print(batch_size)
 racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max = np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg), np.empty(nb_alg)
 k = 0
 ind_batch = 0
@@ -55,7 +54,6 @@ for j in range(nb_alg):
             ind_batch-=1
         else:
             nb_gd_eval_sto = torch.arange(0,int((n_iter+1)*batch_size[0]),int(batch_size[ind_batch]))
-        print(nb_gd_eval_sto)
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)    
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
         plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
@@ -113,4 +111,3 @@ axs.set_title("Table of statistics of racoga value along iterations",fontsize=13
 plt.savefig(path_figure_racoga + 'table.png')
 print(L * param["rho"] > L_max )
 print(param["rho"]*L,L_max)
-print(algo["nag"])

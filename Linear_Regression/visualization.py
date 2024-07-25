@@ -100,4 +100,3 @@ axs.set_title("Table of statistics of racoga value along iterations",fontsize=13
 plt.savefig(path_figure_racoga + 'table.png')
 print(L * param["rho"] > L_max )
 print(param["rho"]*L,L_max)
-print(algo["nag"])

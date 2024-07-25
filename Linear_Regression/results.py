@@ -7,36 +7,44 @@ from linear_regression import * ## Il y a des problèmes dans le code, les promp
 ## Où importer les modules?
 # torch.set_default_dtype(torch.float64)
 version_bis = False # Set true to not overwrite the first data experiment
+load_features = False
+alternative_sampling = True
 ## data results folder
 
-d,N=200,20#choice of dimension d, number of functions N
+d,N = 50,50#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=1*10**4
+n_iter=5*10**4
 
-# gaussian features
-# mean = np.ones(d)*10
-mean = torch.zeros(d)
-features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-# for j in range(1):
-#     features_matrix[j,:] /= 10**1
-# gaussian mixture features
-nb_class = 10
-# mean = nprandom.uniform(-d,d,(nb_class,d))
-# print(np.std(mean))
-# # mean = np.vstack([10*np.ones(d),-1*np.ones(d),-np.arange(d)])
-mean = torch.rand(nb_class,d) * 2 * d - d # random
-print(mean)
-# mean = torch.diag(torch.cat((torch.ones(N),torch.zeros(d-N))))*50 # orthognal
-# nb_class = len(mean[:,0])
-mixture_prob=np.array([0.1,0.3,0.6])
-features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
-# features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)
+if load_features:
+    features = np.load("features.npy")
+    features_matrix, bias = features["features_matrix"], features["bias"]
+else:
 
-# Orthogonal features
-# features_matrix,bias = features_orthogonal(d,N) 
-# bias = torch.zeros(N)
+    # gaussian features
+    # mean = np.ones(d)*10
+    mean = torch.zeros(d)*1000
+    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    # for j in range(1):
+    #     features_matrix[j,:] /= 10**1
+    # gaussian mixture features
+    nb_class = 2
+    mean = torch.rand(nb_class,d) * 2 * d - d # random
+    if alternative_sampling == True:
+        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    # else:
+    #     mixture_prob = np.ones(nb_class)/nb_class
+    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+
+    # Orthogonal features
+    # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
+    # bias = torch.zeros(N)
+
+features = {"features_matrix" : features_matrix, "bias" : bias}
+np.save("features",features)
+
 
 if len(mean.shape)== 1: # 0 : unbiased, 2 : mixture
     features_type = 0
@@ -57,7 +65,7 @@ else:
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
 print("Conditionnement : ", mu/L)
-rho = torch.tensor([0.5,1])*N/batch_size ## Overparameterized exemple value
+rho = torch.tensor([0.4])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))
@@ -79,7 +87,7 @@ nb_rho = len(rho)
 np.save("nb_rho",nb_rho)
 f_i = np.empty((n_iter,nb_rho))
 for i in range(nb_rho):  
-    f_snag,b= SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
+    f_snag,b= SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class,L_max=L_max)
     racoga['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = b 
     algo['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = f_snag
     labels.append("rho = " + str(float(rho[i])*batch_size/N) + "*N/k")

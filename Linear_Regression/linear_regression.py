@@ -15,12 +15,12 @@ def features_gaussian(d, N, mean, generate_bias=False):
     features_matrix = torch.distributions.MultivariateNormal(mean, scale_tril= torch.tril(cov_matrix))
     return features_matrix.sample((N,)), bias
 
-def features_orthogonal(d,N,prompt_lambda_vec = False, generate_bias = False):
-    if prompt_lambda_vec == False:
+def features_orthogonal(d,N,generate_lambda = False, generate_bias = False):
+    if generate_lambda:
         lambda_vec = torch.distributions.Exponential(1).sample((N,))
+        features_matrix = torch.eye(N,d)*lambda_vec.reshape(N,1)
     else:
-        lambda_vec = prompt_lambda_vec
-    features_matrix = torch.eye(N,d)*lambda_vec.reshape(N,1)
+        features_matrix = torch.eye(N,d)
     if generate_bias :
         bias = torch.normal(torch.rand(N) * 2 * N - N, torch.tensor([N]))
         return features_matrix,bias
@@ -109,13 +109,13 @@ def racoga_computation(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
     corr = torch.matmul(grad,grad.T)
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
-    return racoga
+    return N/(1+2*racoga)
     
 def racoga_computation_alternative_sampling(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
     corr = torch.matmul(grad,grad.T)
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
-    return racoga    
+    return N/(1+2*racoga)    
 
 def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
     f_GD = torch.empty(n_iter)
@@ -137,7 +137,7 @@ def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
         return f_GD,racoga
     else:
         return f_GD
-              
+            
 def SGD(x_0, L_sgd, n_iter, n_sample, d, batch_size, N, features_matrix, bias, random_init=False, return_racoga=False, alternative_sampling=False, nb_class=None):
     x_SGD = torch.empty((n_iter, d, n_sample))
     f_SGD = torch.empty((n_iter, n_sample))
@@ -162,6 +162,8 @@ def SGD(x_0, L_sgd, n_iter, n_sample, d, batch_size, N, features_matrix, bias, r
             gradient_sto = grad_sto_f_batch_rep(x_SGD[i, :, :], d, N, n_sample, batch_size, features_matrix, bias, nb_class)
         if return_racoga:
             racoga[i] = racoga_computation(x_SGD[i, :, 0], N, features_matrix, bias)
+        # grad =(torch.matmul(features_matrix,x_SGD[i, :, :])-bias)[:,0].reshape(N,1)*features_matrix
+        # gradient_sto = grad[int(i%N),:].reshape(N,1)
         x_SGD[i + 1, :, :] = x_SGD[i, :, :] - step * gradient_sto
         f_SGD[i + 1, :] = f_sample(x_SGD[i + 1, :, :], N, features_matrix, bias)
 
@@ -198,7 +200,7 @@ def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
     else:
         return f_nag         
 
-def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None):
+def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None,L_max = None):
 
     x_snag = torch.empty((n_iter,d,n_sample))
     y_snag = torch.empty((n_iter,d,n_sample))
@@ -223,6 +225,7 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
 
     # Params
     step = 1/(L*rho)
+    step = 1/L_max
     eta = 1/(np.sqrt(mu*L)*rho)
     beta = 1-np.sqrt( (mu/L) )/rho
     alpha = 1/(1+(1/rho)*np.sqrt(mu/L))
@@ -233,6 +236,8 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
             gradient_sto = grad_sto_f_batch_rep(y_snag[i-1,:,:],d,N,n_sample,batch_size,features_matrix,bias,nb_class)
         if return_racoga == True:
             racoga[i-1] = racoga_computation(y_snag[i-1,:,0],N,features_matrix,bias)
+        # grad =(torch.matmul(features_matrix,y_snag[i-1,:,:])-bias)[:,0].reshape(N,1)*features_matrix
+        # gradient_sto = grad[int(i%N),:].reshape(N,1)
         x_snag[i,:,:] = y_snag[i-1,:,:] - step*gradient_sto
         z_snag[i,:,:] = beta*z_snag[i-1,:,:] + (1-beta)*y_snag[i-1,:,:] - eta*gradient_sto
         y_snag[i,:,:] = z_snag[i,:,:]*(1-alpha) + (alpha)*x_snag[i,:,:]
