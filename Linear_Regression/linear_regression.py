@@ -109,13 +109,16 @@ def racoga_computation(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
     corr = torch.matmul(grad,grad.T)
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
-    return N/(1+2*racoga)
+    # return N/(1+2*racoga)
+    return racoga
+    
     
 def racoga_computation_alternative_sampling(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
     corr = torch.matmul(grad,grad.T)
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
     return N/(1+2*racoga)    
+
 
 def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
     f_GD = torch.empty(n_iter)
