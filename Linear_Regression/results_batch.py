@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.linalg as nplinalg
 import numpy.random as nprandom
 import matplotlib.pyplot as plt
 import torch 

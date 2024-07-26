@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.linalg as nplinalg
 import numpy.random as nprandom
 import matplotlib.pyplot as plt
 import torch 
@@ -11,14 +10,15 @@ load_features = False
 alternative_sampling = True
 ## data results folder
 
-d,N = 50,50#choice of dimension d, number of functions N
+d,N = 50,20#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=5*10**4
+n_iter=3*10**4
+
 
 if load_features:
-    features = np.load("features.npy")
+    features = torch.load("features")
     features_matrix, bias = features["features_matrix"], features["bias"]
 else:
 
@@ -31,8 +31,12 @@ else:
     # gaussian mixture features
     nb_class = 2
     mean = torch.rand(nb_class,d) * 2 * d - d # random
+    nb_class = 2
+    mean = torch.eye(nb_class,d)*d**2
+    print(torch.matmul(mean,mean.t()))
     if alternative_sampling == True:
         features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    bias = torch.zeros(N)
     # else:
     #     mixture_prob = np.ones(nb_class)/nb_class
     #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
@@ -43,7 +47,7 @@ else:
     # bias = torch.zeros(N)
 
 features = {"features_matrix" : features_matrix, "bias" : bias}
-np.save("features",features)
+torch.save(features,"features")
 
 
 if len(mean.shape)== 1: # 0 : unbiased, 2 : mixture
@@ -52,6 +56,7 @@ else:
     features_type = 1
 
 x_0 = torch.normal(torch.zeros(d),torch.ones(d))
+# x_0 = torch.ones(d)*d*10
 np.save("features_type",features_type)
 ## We compute L and mu using AA^T or AA^T, where A is the matrix feature, depending of which matrix is the largest
 ## and thus the easier to compute (the largest eigenvalue is the same for both cases)
@@ -65,7 +70,7 @@ else:
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
 print("Conditionnement : ", mu/L)
-rho = torch.tensor([0.4])*N/batch_size ## Overparameterized exemple value
+rho = torch.tensor([0.1,0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))
@@ -106,7 +111,9 @@ for i in range(nb_rho):
 # labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
 # index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
 
-
+print("average corelation", np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)].mean())
+print("variance norm : ", torch.std(vec_norm))
+print(np.where(np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]<0))
 root = "simul_data/" 
 
 if features_type == 0:
@@ -120,5 +127,7 @@ torch.save(algo,root +"algo_"+suffixe+ 'rho='+ str(nb_rho)+ ".pth")
 torch.save(racoga,root +"racoga_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(labels),root +"labels_" + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(index),root +"index_"+ 'rho='+ str(nb_rho)+ ".pth")
-
+vec_corr = np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]
+plt.hist(vec_corr,bins = np.linspace(vec_corr.min(), vec_corr.max(),100))
+plt.show()
 exec(open('visualization.py').read()) 

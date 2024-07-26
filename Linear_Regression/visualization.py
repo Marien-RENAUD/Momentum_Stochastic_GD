@@ -49,8 +49,8 @@ for j in range(nb_alg):
     if len(algo[index[j]].shape) >1:
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
-        plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
-        plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
+        # plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
+        # plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
     else:
         plt.plot(nb_gd_eval_det,torch.log(algo[index[j]]),label=labels[j],color =col,lw=2)
     racoga_current = racoga[index[j]]

@@ -228,7 +228,7 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
 
     # Params
     step = 1/(L*rho)
-    step = 1/L_max
+    # step = 1/L_max
     eta = 1/(np.sqrt(mu*L)*rho)
     beta = 1-np.sqrt( (mu/L) )/rho
     alpha = 1/(1+(1/rho)*np.sqrt(mu/L))
@@ -240,7 +240,7 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
         if return_racoga == True:
             racoga[i-1] = racoga_computation(y_snag[i-1,:,0],N,features_matrix,bias)
         # grad =(torch.matmul(features_matrix,y_snag[i-1,:,:])-bias)[:,0].reshape(N,1)*features_matrix
-        # gradient_sto = grad[int(i%N),:].reshape(N,1)
+        # gradient_sto = grad[int((i+1)%N),:].reshape(N,1)
         x_snag[i,:,:] = y_snag[i-1,:,:] - step*gradient_sto
         z_snag[i,:,:] = beta*z_snag[i-1,:,:] + (1-beta)*y_snag[i-1,:,:] - eta*gradient_sto
         y_snag[i,:,:] = z_snag[i,:,:]*(1-alpha) + (alpha)*x_snag[i,:,:]
