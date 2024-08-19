@@ -7,14 +7,14 @@ from linear_regression import * ## Il y a des problèmes dans le code, les promp
 # torch.set_default_dtype(torch.float64)
 version_bis = False # Set true to not overwrite the first data experiment
 load_features = False
-alternative_sampling = True
+alternative_sampling = False
 ## data results folder
 
-d,N = 50,20#choice of dimension d, number of functions N
+d,N = 1000,100#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=3*10**4
+n_iter=1*10**4
 
 
 if load_features:
@@ -23,24 +23,23 @@ if load_features:
 else:
 
     # gaussian features
-    # mean = np.ones(d)*10
-    mean = torch.zeros(d)*1000
+    # mean = torch.zeros(d)
     # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    # nb_class = 2
     # for j in range(1):
     #     features_matrix[j,:] /= 10**1
+
     # gaussian mixture features
-    nb_class = 2
+    nb_class = 10
     mean = torch.rand(nb_class,d) * 2 * d - d # random
-    nb_class = 2
-    mean = torch.eye(nb_class,d)*d**2
+    # mean = torch.eye(nb_class,d)*d**2
     print(torch.matmul(mean,mean.t()))
     if alternative_sampling == True:
         features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    bias = torch.zeros(N)
-    # else:
-    #     mixture_prob = np.ones(nb_class)/nb_class
-    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    else:
+        mixture_prob = np.ones(nb_class)/nb_class
+        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
@@ -70,7 +69,7 @@ else:
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
 print("Conditionnement : ", mu/L)
-rho = torch.tensor([0.1,0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
+rho = torch.tensor([0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))
@@ -121,7 +120,7 @@ if features_type == 0:
 else:
     suffixe = 'gaussian_mixture_'
 
-param = {'d' : d, 'N' : N,'n_iter' : n_iter, 'batch_size' : batch_size, 'mu' : mu, 'L' : L, 'L_max' : L_max, 'L_sgd' : L_sgd, 'rho' : rho}
+param = {'d' : d, 'N' : N,'n_iter' : n_iter, 'batch_size' : batch_size, 'mu' : mu, 'L' : L, 'L_max' : L_max, 'L_sgd' : L_sgd, 'rho' : rho, 'nb_class' : nb_class}
 torch.save(param,root + "param_"+suffixe + 'rho='+ str(nb_rho) + ".pth") ### If not working, set working directory to /Linear_Regression
 torch.save(algo,root +"algo_"+suffixe+ 'rho='+ str(nb_rho)+ ".pth")
 torch.save(racoga,root +"racoga_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")

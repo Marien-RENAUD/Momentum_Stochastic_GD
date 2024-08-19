@@ -10,7 +10,7 @@ bias = torch.zeros(2)
 
 N,d = 2,2
 n_sample = 1
-n_iter = 1*10**3
+n_iter = 3*10**3
 mu = torch.min(torch.linalg.eigh(torch.matmul(features_matrix, features_matrix.T))[0]) / N
 print("mu = ",mu)
 L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix, features_matrix.T))[0]) / N 
@@ -28,7 +28,7 @@ x_gd,racoga_gd,f_gd = GD(x_0,L,int(n_iter*batch_size/N)+1,d,N,features_matrix,bi
 x_sgd,racoga_sgd,f_sgd= SGD(x_0,L_sgd,n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
 x_snag,b,f_snag= SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
 print("average corelation", np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)].mean())
-print(np.where(np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]<0))
+
 # n_ech = 10**3
 # vec_ech = torch.empty(n_ech)
 # vec_x = torch.empty((n_ech,d))

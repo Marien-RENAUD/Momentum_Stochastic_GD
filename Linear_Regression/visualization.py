@@ -9,12 +9,13 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
+
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
 else :
     path_figure_root = 'results/gaussian_mixture/'
-    suffixe = 'gaussian_mixture_'
+    suffixe = 'gaussian_mixture_' 
 
 param= torch.load(root +"param_" + suffixe + 'rho='+ str(nb_rho) + ".pth")
 algo = torch.load(root +"algo_" + suffixe + 'rho='+ str(nb_rho) + ".pth")
@@ -60,7 +61,10 @@ df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "i
 plt.xlabel("Nb gradient evaluations",fontsize = 13)
 plt.ylabel(r"$\log(f)$",fontsize= 13)
 plt.legend()
-plt.title("Algorithms convergence, N = " + str(N) + ", d = " + str(d))
+if features_type == 1:
+    plt.title("Algorithms convergence for " + str(param["nb_class"]) + "classes, N = " + str(N) + ", d = " + str(d))
+else:
+    plt.title("Algorithms convergence, N = " + str(N) + ", d = " + str(d))
 plt.savefig(path_figure_cv)
 plt.figure(figsize=(10,5))
 plt.subplot(221)
