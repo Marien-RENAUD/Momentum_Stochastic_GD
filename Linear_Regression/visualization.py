@@ -29,7 +29,8 @@ d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"
 
 labels = torch.load(root + "labels_rho="+ str(nb_rho) + ".pth")
 index = torch.load(root + "index_rho="+ str(nb_rho) + ".pth")
-plt.figure(figsize=(20,10))
+plt.figure(figsize=(10,5))
+plt.subplot(121)
 nb_alg = len(labels) 
 nb_rho = len(param["rho"])
 nb_gd_eval_det = torch.arange(0,(n_iter+1)*batch_size,N)
@@ -39,17 +40,17 @@ racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, r
 k = 0
 for j in range(nb_alg):
     if j==0:
-        col = "black"
+        col = "blue"
     elif j ==1:
-        col = "grey"
+        col = "cyan"
     elif j == 2:
         col = "red"
     else:
-        col = (0.25, k/nb_rho ,1-k/nb_rho)
+        col = (0.5, 1- 0.5*k/nb_rho,0)
         k+=1
     if len(algo[index[j]].shape) >1:
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)
-        plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
+        plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=3)
         # plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
         # plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
     else:
@@ -58,14 +59,24 @@ for j in range(nb_alg):
     racoga_mean[j],racoga_median[j], racoga_decile_inf[j], racoga_quantile_01[j], racoga_min[j], racoga_max[j] = racoga_current.mean(), np.quantile(racoga_current,0.5,method = 'nearest'), np.quantile(racoga_current,0.1,method = 'nearest'), np.quantile(racoga_current,0.01,method = 'nearest'), racoga_current.min(), racoga_current.max()
 vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max))
 df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
-plt.xlabel("Nb gradient evaluations",fontsize = 13)
-plt.ylabel(r"$\log(f)$",fontsize= 13)
-plt.legend()
-if features_type == 1:
-    plt.title("Algorithms convergence for " + str(param["nb_class"]) + "classes, N = " + str(N) + ", d = " + str(d))
-else:
-    plt.title("Algorithms convergence, N = " + str(N) + ", d = " + str(d))
+plt.xlabel("Nb gradient evaluations",fontsize = 10)
+plt.ylabel(r"$\log(f)$",fontsize= 10)
+plt.xticks((0,n_iter*batch_size))
+plt.yticks((-10,20))
+plt.legend(fontsize = 8)
+plt.subplot(122)
+
+for j in range(nb_rho):
+    col = (0.5, 1- 1/nb_rho + 0.5*j/nb_rho ,0)
+    plt.hist(racoga[index[5-j]],bins=np.linspace(racoga[index[5-j]].min(),racoga[index[5-j]].max(),100),edgecolor="white",facecolor = col,label = labels[5-j],density = True,alpha = 0.75)
+plt.xlabel("RACOGA",fontsize =10)
+plt.xticks((-0.5,0,3))
+plt.yticks((0,2.5))
+plt.legend(fontsize = 8)
 plt.savefig(path_figure_cv)
+
+
+
 plt.figure(figsize=(10,5))
 plt.subplot(221)
 plt.yticks((racoga["gd"].min(),0,racoga["gd"].max()))
