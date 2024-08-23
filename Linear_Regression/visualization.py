@@ -9,6 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
+features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
