@@ -23,23 +23,23 @@ if load_features:
 else:
 
     # gaussian features
-    # mean = torch.zeros(d)
-    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    # nb_class = 2
+    mean = torch.zeros(d)
+    features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    nb_class = 2
     # for j in range(1):
     #     features_matrix[j,:] /= 10**1
 
     # gaussian mixture features
-    nb_class = 10
-    mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # mean = torch.eye(nb_class,d)*d**2
-    print(torch.matmul(mean,mean.t()))
-    if alternative_sampling == True:
-        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    else:
-        mixture_prob = np.ones(nb_class)/nb_class
-        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    # nb_class = 10
+    # mean = torch.rand(nb_class,d) * 2 * d - d # random
+    # # mean = torch.eye(nb_class,d)*d**2
+    # print(torch.matmul(mean,mean.t()))
+    # if alternative_sampling == True:
+    #     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    # else:
+    #     mixture_prob = np.ones(nb_class)/nb_class
+    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
@@ -69,7 +69,7 @@ else:
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
 print("Conditionnement : ", mu/L)
-rho = torch.tensor([0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
+rho = torch.tensor([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))
@@ -124,9 +124,10 @@ param = {'d' : d, 'N' : N,'n_iter' : n_iter, 'batch_size' : batch_size, 'mu' : m
 torch.save(param,root + "param_"+suffixe + 'rho='+ str(nb_rho) + ".pth") ### If not working, set working directory to /Linear_Regression
 torch.save(algo,root +"algo_"+suffixe+ 'rho='+ str(nb_rho)+ ".pth")
 torch.save(racoga,root +"racoga_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
-torch.save(np.array(labels),root +"labels_" + 'rho='+ str(nb_rho)+ ".pth")
+torch.save(np.array(labels),root +"labels_" + suffixe + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(index),root +"index_"+ 'rho='+ str(nb_rho)+ ".pth")
 vec_corr = np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]
+print("corr moyenne entre données : ", vec_corr.mean())
 plt.hist(vec_corr,bins = np.linspace(vec_corr.min(), vec_corr.max(),100))
 plt.show()
 exec(open('visualization.py').read()) 

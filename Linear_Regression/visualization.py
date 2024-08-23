@@ -9,7 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-
+features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -27,7 +27,7 @@ path_figure_racoga = path_figure_root + "racoga/" + '_d=' + str(param['d']) + '_
 
 d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"], param["batch_size"], param["mu"], param["L"], param["L_max"]
 
-labels = torch.load(root + "labels_rho="+ str(nb_rho) + ".pth")
+labels = torch.load(root + "labels_" + suffixe  + "rho="+ str(nb_rho) + ".pth")
 index = torch.load(root + "index_rho="+ str(nb_rho) + ".pth")
 plt.figure(figsize=(10,5))
 plt.subplot(121)
@@ -65,13 +65,18 @@ plt.xticks((0,n_iter*batch_size))
 plt.yticks((-10,20))
 plt.legend(fontsize = 8)
 plt.subplot(122)
-
+min_hist = np.nan
+max_hist = np.nan
 for j in range(nb_rho):
     col = (0.5, 1- 1/nb_rho + 0.5*j/nb_rho ,0)
+    # rho_hist = N/(1+2*racoga[index[5-j]])
     plt.hist(racoga[index[5-j]],bins=np.linspace(racoga[index[5-j]].min(),racoga[index[5-j]].max(),100),edgecolor="white",facecolor = col,label = labels[5-j],density = True,alpha = 0.75)
+    # plt.hist(rho_hist,bins=np.linspace(rho_hist.min(),rho_hist.max(),100),edgecolor="white",facecolor = col,label = labels[5-j],density = True,alpha = 0.75)
+    # print(rho_hist)
+    min_hist,max_hist = np.nanmin([min_hist,racoga[index[5-j]].min()]), np.nanmax([max_hist,racoga[index[5-j]].max()])
 plt.xlabel("RACOGA",fontsize =10)
-plt.xticks((-0.5,0,3))
-plt.yticks((0,2.5))
+plt.xticks((min_hist,0,max_hist))
+plt.yticks((0,2))
 plt.legend(fontsize = 8)
 plt.savefig(path_figure_cv)
 
