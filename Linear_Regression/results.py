@@ -26,8 +26,6 @@ else:
     mean = torch.zeros(d)
     features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
     nb_class = 2
-    # for j in range(1):
-    #     features_matrix[j,:] /= 10**1
 
     # gaussian mixture features
     # nb_class = 10
@@ -125,9 +123,11 @@ torch.save(param,root + "param_"+suffixe + 'rho='+ str(nb_rho) + ".pth") ### If 
 torch.save(algo,root +"algo_"+suffixe+ 'rho='+ str(nb_rho)+ ".pth")
 torch.save(racoga,root +"racoga_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(labels),root +"labels_" + suffixe + 'rho='+ str(nb_rho)+ ".pth")
-torch.save(np.array(index),root +"index_"+ 'rho='+ str(nb_rho)+ ".pth")
-vec_corr = np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]
-print("corr moyenne entre données : ", vec_corr.mean())
-plt.hist(vec_corr,bins = np.linspace(vec_corr.min(), vec_corr.max(),100))
+torch.save(np.array(index),root +"index_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
+
+norm_grad = np.sqrt((features_matrix**2).sum(axis= 1)).reshape(N,1)
+vec_corr = (np.dot(features_matrix,features_matrix.T)/(norm_grad*norm_grad.T))[np.triu_indices(N,1)]
+torch.save(vec_corr.mean(),root +"corr_data_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
+plt.hist(vec_corr)
 plt.show()
 exec(open('visualization.py').read()) 
