@@ -9,7 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-# features_type = 0
+features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -68,7 +68,7 @@ labelpad = 2
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
 plt.xticks((0,n_iter*batch_size), fontsize = number_size)
-plt.yticks((13,19), fontsize = number_size)
+plt.yticks((5,19), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.subplot(122)
 min_hist = np.nan
@@ -76,14 +76,14 @@ max_hist = np.nan
 for j in range(nb_rho):
     col = (0.3, 0.6, 1 - 0.8*(j)/nb_rho ) #(0.5, 1- 1/nb_rho + 0.5*j/nb_rho ,0)
     # rho_hist = N/(1+2*racoga[index[3+j]])
-    plt.hist(racoga[index[3+j]],bins=np.linspace(racoga[index[3+j]].min(),racoga[index[3+j]].max(),100),edgecolor=None,facecolor = col,label = labels[3+j],density = True,alpha = 0.5)
+    plt.hist(racoga[index[3+j]],bins="sqrt",edgecolor=None,facecolor = col,label = labels[3+j],density = True,alpha = 0.5)
     # plt.hist(rho_hist,bins=np.linspace(rho_hist.min(),rho_hist.max(),100),edgecolor="white",facecolor = col,label = labels[3+j],density = True,alpha = 0.75)
     # print(rho_hist)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
-plt.xticks((-0.5,0,2),["-0.5", "0", "2"], fontsize = number_size)
+plt.xticks((-0.15,0,0.2),["-0.15", "0", "0.2"], fontsize = number_size)
 # plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-plt.yticks((0,1), fontsize = number_size)
+plt.yticks((0,20), fontsize = number_size)
 
 plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
