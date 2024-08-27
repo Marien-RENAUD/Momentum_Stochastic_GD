@@ -14,7 +14,7 @@ d,N = 1000,100#choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=1*10**4
+n_iter=1*10**3
 
 
 if load_features:
@@ -23,21 +23,21 @@ if load_features:
 else:
 
     # gaussian features
-    # mean = torch.zeros(d)
-    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    # nb_class = 2
+    mean = torch.zeros(d)
+    features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    nb_class = 2
 
     # gaussian mixture features
-    nb_class = 10
-    mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # mean = torch.eye(nb_class,d)*d**2
-    print(torch.matmul(mean,mean.t()))
-    if alternative_sampling == True:
-        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    else:
-        mixture_prob = np.ones(nb_class)/nb_class
-        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    # nb_class = 10
+    # mean = torch.rand(nb_class,d) * 2 * d - d # random
+    # # mean = torch.eye(nb_class,d)*d**2
+    # print(torch.matmul(mean,mean.t()))
+    # if alternative_sampling == True:
+    #     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    # else:
+    #     mixture_prob = np.ones(nb_class)/nb_class
+    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
@@ -92,7 +92,7 @@ for i in range(nb_rho):
     f_snag,b= SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class,L_max=L_max)
     racoga['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = b 
     algo['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = f_snag
-    labels.append("rho = " + str(float(rho[i])*batch_size/N) + "*N/k")
+    labels.append("SNAG " + r'$\rho = $' + str(float(rho[i])*batch_size/N) + "*N/k")
     index.append('snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k")
 # i=0
 # rho = np.array([0.5,1])*N/batch_size
@@ -128,6 +128,6 @@ torch.save(np.array(index),root +"index_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth"
 norm_grad = np.sqrt((features_matrix**2).sum(axis= 1)).reshape(N,1)
 vec_corr = (np.dot(features_matrix,features_matrix.T)/(norm_grad*norm_grad.T))[np.triu_indices(N,1)]
 torch.save(vec_corr.mean(),root +"corr_data_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
-plt.hist(vec_corr)
-plt.show()
+# plt.hist(vec_corr)
+# plt.show()
 exec(open('visualization.py').read()) 

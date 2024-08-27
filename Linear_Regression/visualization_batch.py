@@ -30,7 +30,8 @@ d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"
 
 labels = torch.load(root + "labels_" + "batch=" + str(nb_batch) + ".pth")
 index = torch.load(root + "index_"+  "batch=" + str(nb_batch) +".pth")
-plt.figure(figsize=(20,10))
+plt.figure(figsize=(10,5))
+plt.subplot(121)
 nb_alg = len(labels) 
 nb_rho = len(param["rho"])
 nb_gd_eval_det = torch.arange(0,(n_iter+1)*int(batch_size[0]),N)
@@ -40,13 +41,13 @@ k = 0
 ind_batch = 0
 for j in range(nb_alg):
     if j==0:
-        col = "black"
+        col = "purple"
     elif j ==1:
-        col = "grey"
+        col = "black"
     elif j == 2:
         col = "red"
     else:
-        col = (0.25, k/nb_rho ,1-k/nb_rho)
+        col =  (0.3, 0.6, 1 - 0.8*k/nb_rho )
         k+=1
     if len(algo[index[j]].shape) >1:
         if j == 1:
@@ -55,9 +56,9 @@ for j in range(nb_alg):
         else:
             nb_gd_eval_sto = torch.arange(0,int((n_iter+1)*batch_size[0]),int(batch_size[ind_batch]))
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)    
-        plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=2)
-        plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
-        plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
+        plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=3, alpha = 0.8)
+        # plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
+        # plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
         racoga_current = (racoga[index[j]] + (batch_size[ind_batch]-1)*(N - racoga[index[j]])/(N-1))/batch_size[ind_batch]
         ind_batch += 1
 
@@ -67,11 +68,33 @@ for j in range(nb_alg):
     racoga_mean[j],racoga_median[j], racoga_decile_inf[j], racoga_quantile_01[j], racoga_min[j], racoga_max[j] = racoga_current.mean(), np.quantile(racoga_current,0.5,method = 'nearest'), np.quantile(racoga_current,0.1,method = 'nearest'), np.quantile(racoga_current,0.01,method = 'nearest'), racoga_current.min(), racoga_current.max()
 vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max))
 df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
-plt.xlabel("Nb gradient evaluations",fontsize = 13)
-plt.ylabel(r"$\log(f)$",fontsize= 13)
-plt.legend()
-plt.title("Algorithms convergence, N = " + str(N) + ", d = " + str(d))
+label_size = 20
+legend_size = 10
+number_size = 15
+labelpad = 2
+plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
+plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
+plt.xticks((0,n_iter*batch_size[0]), fontsize = number_size)
+plt.yticks((-10,20), fontsize = number_size)
+plt.legend(fontsize = legend_size)
+plt.subplot(122)
+min_hist = np.nan
+max_hist = np.nan
+for j in range(nb_rho):
+    col = (0.3, 0.6, 1 - 0.8*(j)/nb_rho ) 
+    plt.hist(racoga[index[j+3]],bins=np.linspace(racoga[index[j+3]].min(),racoga[index[j+3]].max(),50),edgecolor="black",facecolor = col,label = labels[j+3],density = True,alpha = 0.5)
+    min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
+plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
+plt.xticks((-0.2,0,0.2),["-0.2", "0", "0.2"], fontsize = number_size)
+# plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
+plt.yticks((0,20), fontsize = number_size)
+plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
+
+
+
+
+
 plt.figure(figsize=(10,5))
 plt.subplot(221)
 plt.yticks((racoga["gd"].min(),0,racoga["gd"].max()))

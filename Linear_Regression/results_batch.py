@@ -13,7 +13,7 @@ d,N=1000,100 #choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = torch.tensor([1,10,25]) #size of batch
-rho = 0.25*N/batch_size
+rho = 1*N/batch_size
 # rho = torch.tensor([0.25,0.5,1])*N/batch_size
 n_iter=1*10**4
 
@@ -24,20 +24,20 @@ if load_features:
 else:
     # gaussian features
     # mean = np.ones(d)*10
-    # mean = torch.zeros(d)*1000
-    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    # for j in range(1):
-    #     features_matrix[j,:] /= 10**1
+    mean = torch.zeros(d)*1000
+    features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    nb_class = None
+    
     # gaussian mixture features
-    nb_class = 10
-    mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # # nb_class = len(mean[:,0])
-    if alternative_sampling == True:
-        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    else:
-        mixture_prob = np.ones(nb_class)/nb_class
-        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    # nb_class = 10
+    # mean = torch.rand(nb_class,d) * 2 * d - d # random
+    # # # nb_class = len(mean[:,0])
+    # if alternative_sampling == True:
+    #     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    # else:
+    #     mixture_prob = np.ones(nb_class)/nb_class
+    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 

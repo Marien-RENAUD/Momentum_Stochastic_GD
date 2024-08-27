@@ -9,7 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-features_type = 0
+# features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -30,7 +30,6 @@ d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"
 labels = torch.load(root + "labels_" + suffixe  + "rho="+ str(nb_rho) + ".pth")
 index = torch.load(root + "index_"+ suffixe + "rho="+ str(nb_rho) + ".pth")
 plt.figure(figsize=(10,5))
-plt.suptitle("Averaged data correlation = " + str(round(corr_data.item(),2)))
 plt.subplot(121)
 nb_alg = len(labels) 
 nb_rho = len(param["rho"])
@@ -69,7 +68,7 @@ labelpad = 2
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
 plt.xticks((0,n_iter*batch_size), fontsize = number_size)
-plt.yticks((-10,20), fontsize = number_size)
+plt.yticks((5,18), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.subplot(122)
 min_hist = np.nan
@@ -82,9 +81,9 @@ for j in range(nb_rho):
     # print(rho_hist)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
-plt.xticks((-0.25,0,0.2),["-0.25", "0", "0.2"], fontsize = number_size)
+plt.xticks((-0.15,0,0.2),["-0.15", "0", "0.2"], fontsize = number_size)
 # plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-plt.yticks((0,2), fontsize = number_size)
+plt.yticks((0,28), fontsize = number_size)
 
 plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
