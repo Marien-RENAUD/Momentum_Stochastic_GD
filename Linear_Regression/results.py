@@ -23,21 +23,21 @@ if load_features:
 else:
 
     # gaussian features
-    mean = torch.zeros(d)
-    features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    nb_class = 2
+    # mean = torch.zeros(d)
+    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    # nb_class = 2
 
     # gaussian mixture features
-    # nb_class = 10
-    # mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # # mean = torch.eye(nb_class,d)*d**2
-    # print(torch.matmul(mean,mean.t()))
-    # if alternative_sampling == True:
-    #     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    # else:
-    #     mixture_prob = np.ones(nb_class)/nb_class
-    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    nb_class = 10
+    mean = torch.rand(nb_class,d) * 2 * d - d # random
+    # mean = torch.eye(nb_class,d)*d**2
+    print(torch.matmul(mean,mean.t()))
+    if alternative_sampling == True:
+        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    else:
+        mixture_prob = np.ones(nb_class)/nb_class
+        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
@@ -67,7 +67,7 @@ else:
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
 print("Conditionnement : ", mu/L)
-rho = torch.tensor([0.5,1,1.5])*N/batch_size ## Overparameterized exemple value
+rho = torch.tensor([0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))

@@ -68,7 +68,7 @@ labelpad = 2
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
 plt.xticks((0,n_iter*batch_size), fontsize = number_size)
-plt.yticks((5,18), fontsize = number_size)
+plt.yticks((13,19), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.subplot(122)
 min_hist = np.nan
@@ -81,9 +81,9 @@ for j in range(nb_rho):
     # print(rho_hist)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
-plt.xticks((-0.15,0,0.2),["-0.15", "0", "0.2"], fontsize = number_size)
+plt.xticks((-0.5,0,2),["-0.5", "0", "2"], fontsize = number_size)
 # plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-plt.yticks((0,28), fontsize = number_size)
+plt.yticks((0,1), fontsize = number_size)
 
 plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
