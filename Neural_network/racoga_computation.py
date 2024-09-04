@@ -40,7 +40,7 @@ to_tensor =  t.ToTensor()
 normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
-train_set = torchvision.datasets.CIFAR10(root='/beegfs/mrenaud/Momentum_Stochastic_GD/dataset', train=True, transform=transform_list, download=True)
+train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
 
 # Load results
 path_results = "results/"

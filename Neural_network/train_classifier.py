@@ -17,7 +17,7 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
+# parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -60,18 +60,18 @@ normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 flatten =  t.Lambda(lambda x:x.view(-1))
 
 transform_list = t.Compose([to_tensor, normalize, flatten])
-train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
-test_set = torchvision.datasets.CIFAR10(root='../dataset', train=False, transform=transform_list, download=True)
+train_set = torchvision.datasets.CIFAR10(root='/beegfs/jhermant/Momentum_Stochastic_GD/dataset', train=True, transform=transform_list, download=True)
+test_set = torchvision.datasets.CIFAR10(root='/beegfs/jhermant/Momentum_Stochastic_GD/dataset', train=False, transform=transform_list, download=True)
 
 
-# # Load tensors from the file
-# checkpoint = torch.load('../dataset/sphere/dataset_sphere.pth')
-# # Recreate the tensordataset
-# loaded_dataset = torch.utils.data.TensorDataset(checkpoint['data'], checkpoint['labels'])
-# train_size = int(5/6 * len(loaded_dataset))
-# test_size = len(loaded_dataset) - train_size
-# # Split dataset between training set and test set
-# train_dataset, test_dataset = torch.utils.data.random_split(loaded_dataset, [train_size, test_size])
+# Load tensors from the file
+checkpoint = torch.load('/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/dataset_sphere.pth')
+# Recreate the tensordataset
+loaded_dataset = torch.utils.data.TensorDataset(checkpoint['data'], checkpoint['labels'])
+train_size = int(5/6 * len(loaded_dataset))
+test_size = len(loaded_dataset) - train_size
+# Split dataset between training set and test set
+train_dataset, test_dataset = torch.utils.data.random_split(loaded_dataset, [train_size, test_size])
 
 
 
@@ -81,14 +81,14 @@ test_set = torchvision.datasets.CIFAR10(root='../dataset', train=False, transfor
 
 batch_size_train = 64
 if alg == "GD" or alg == "NAG":
-    batch_size_train = 50000
+    batch_size_train = 5000
 batch_size_test = 64
 ## Sphere data
-# train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=True)
-# test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
 
-test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test)
-train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
+# test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test)
+# train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
 
 # To obtain non-homogeneous batches: batches that are composed of one class.
 batch_sample = hparams.batch_sample
