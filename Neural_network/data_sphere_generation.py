@@ -23,8 +23,8 @@ n_points = 60000  # Nombre de points à générer
 
 data = points_sur_sphere_torch(d, n_points)
 labels = torch.zeros(n_points,dtype = torch.long)
-labels[torch.where(data[:,:16*32*3].sum(axis=1) < 0)] = 1
-# labels[torch.where((data[:,0]<0)*(data[:,100]<0))]  =1
+# labels[torch.where(data[:,:16*32*3].sum(axis=1) < 0)] = 1
+labels[torch.where((data[:,0]<0))]  =1
 # labels[torch.where((data[:,0]>0)*(data[:,100]<0))]  =2
 # labels[torch.where((data[:,0]>0)*(data[:,100]>0))]  =3
 # labels[:16*32*3]=1

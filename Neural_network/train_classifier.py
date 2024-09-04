@@ -10,6 +10,7 @@ from tqdm.auto import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
 from utils import sort_batches
+from utils import calculate_training_loss
 
 # Define Parser arguments
 parser = ArgumentParser()
@@ -17,10 +18,21 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
-# parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
+
+#
+def set_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(42)
+
 # define network structure 
 network_type = hparams.network_type
 
@@ -60,12 +72,12 @@ normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 flatten =  t.Lambda(lambda x:x.view(-1))
 
 transform_list = t.Compose([to_tensor, normalize, flatten])
-train_set = torchvision.datasets.CIFAR10(root='/beegfs/jhermant/Momentum_Stochastic_GD/dataset', train=True, transform=transform_list, download=True)
-test_set = torchvision.datasets.CIFAR10(root='/beegfs/jhermant/Momentum_Stochastic_GD/dataset', train=False, transform=transform_list, download=True)
+# train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
+# test_set = torchvision.datasets.CIFAR10(root='../dataset', train=False, transform=transform_list, download=True)
 
 
 # Load tensors from the file
-checkpoint = torch.load('/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/dataset_sphere.pth')
+checkpoint = torch.load('../dataset/sphere/dataset_sphere.pth')
 # Recreate the tensordataset
 loaded_dataset = torch.utils.data.TensorDataset(checkpoint['data'], checkpoint['labels'])
 train_size = int(5/6 * len(loaded_dataset))
@@ -81,12 +93,13 @@ train_dataset, test_dataset = torch.utils.data.random_split(loaded_dataset, [tra
 
 batch_size_train = 64
 if alg == "GD" or alg == "NAG":
-    batch_size_train = 5000
+    batch_size_train = 50000
 batch_size_test = 64
 ## Sphere data
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=True)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
 
+# CIFAR10
 # test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test)
 # train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
 
@@ -104,7 +117,7 @@ if batch_sample == "random_with_rpl" or batch_sample == "random_sort":
 # To save the trajectory
 weights_trajectory = []
 loss_trajectory = []
-
+loss_trajectory.append(calculate_training_loss(net, train_loader, criterion, device,network_type))
 net.train()
 n_epoch = hparams.n_epoch
 
@@ -112,7 +125,7 @@ for epoch in range(n_epoch): # training loop
     train_correct = 0
     train_loss = 0
     print('Epoch {}'.format(epoch))
-    
+    k = 0
     # loop per epoch
     for i, (batch, targets) in enumerate(train_loader):
         if batch_sample == "random_with_rpl":
@@ -155,7 +168,8 @@ for epoch in range(n_epoch): # training loop
             train_loss / ((i+1) * batch_size_train), 100 * train_correct / ((i+1) * batch_size_train)))
         if alg == "GD" or alg == "NAG":print('Train loss {:.4f}, Train accuracy {:.2f}%'.format(
             train_loss / ((i+1) * batch_size_train), 100 * train_correct / ((i+1) * batch_size_train)))
-
+        k+=1
+    print("number of batch in epoch : ", k)
 print('End of training.\n')
     
 # === Test === ###
@@ -191,9 +205,10 @@ dict_results = {
     "lr" : lr,
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
-
+dict_loss = {"loss_trajectory" : loss_trajectory}
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+'_'
 torch.save(dict_results, save_name+'dict_results.pth')
+torch.save(dict_loss, save_name+'dict_loss.pth')
 print("Model save in the adress : "+save_name+'dict_results.pth')
 
 plt.plot(loss_trajectory)

@@ -3,11 +3,11 @@ import torchvision
 import torch.nn as nn
 import torchvision.transforms as t
 
-# def create_mlp():
-    # return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10))
-
 def create_mlp():
-    return nn.Sequential(nn.Linear(3 * 32 * 32,128), nn.ReLU(), nn.Linear(128, 2))
+    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10))
+
+# def create_mlp():
+#     return nn.Sequential(nn.Linear(3 * 32 * 32,128), nn.ReLU(), nn.Linear(128, 2))
 
 def create_cnn():
     net = nn.Sequential(

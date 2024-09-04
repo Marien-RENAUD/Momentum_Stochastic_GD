@@ -16,6 +16,7 @@ parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", cho
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--step', type=int, default = 100, help = "interval between each RACOGA computation")
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -23,7 +24,7 @@ device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() e
 batch_sample = hparams.batch_sample
 network_type = hparams.network_type
 n_epoch = hparams.n_epoch
-
+alg = hparams.alg
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -101,7 +102,7 @@ dict = {
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
 }
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'+ alg
 np.save(save_name+'racoga_results.npy', dict)
 
 plt.plot(iteration_list, racoga_list)
