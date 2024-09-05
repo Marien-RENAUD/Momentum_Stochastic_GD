@@ -35,7 +35,7 @@ def sort_batches(train_loader, batch_size, device):
     targets_shuffle = torch.tensor(targets_shuffle).to(device)
     return batch_shuffle, targets_shuffle
 
-def calculate_training_loss(model, train_loader, criterion, device,network_type):
+def calculate_training_loss(model, train_loader, criterion, device,network_type,batch_size_train):
     model.eval()  # Model in evaluate mode
     total_loss = 0.0
     total_samples = 0
@@ -44,7 +44,7 @@ def calculate_training_loss(model, train_loader, criterion, device,network_type)
         for inputs, targets in train_loader:
             inputs, targets = inputs.to(device), targets.to(device)
             if network_type == "CNN":
-                inputs = inputs.view((50000, 3, 32, 32))
+                inputs = inputs.view((batch_size_train, 3, 32, 32))
             # Forward pass
             outputs = model(inputs)
             loss = criterion(outputs, targets)
