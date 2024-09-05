@@ -45,7 +45,7 @@ train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transfor
 
 # Load results
 path_results = "results/"
-dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_dict_results.pth'
+dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg + '_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]
