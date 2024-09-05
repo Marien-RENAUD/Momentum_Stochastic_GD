@@ -96,7 +96,6 @@ if alg == "SGD" or alg == "SNAG":
         racoga = scalar_prod/sum_gradient_norm
         racoga_list.append(racoga.detach().cpu().numpy())
         scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
-
 else:
     for k in tqdm(range(len(weights_trajectory))):
         iteration_list.append(k)
@@ -138,10 +137,10 @@ dict = {
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
 }
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_'+ alg
-np.save(save_name+'racoga_results.npy', dict)
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg
+np.save(save_name+'_racoga_results.npy', dict)
 
 plt.plot(iteration_list, racoga_list)
 plt.xlabel("number of iterations")
 plt.ylabel("RACOGA")
-plt.savefig(save_name+"racoga_evolution.png")
+plt.savefig(save_name+"_racoga_evolution.png")
