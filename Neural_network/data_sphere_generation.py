@@ -17,16 +17,15 @@ def points_sur_sphere_torch(d, n_points):
     
     return points
 
-# Exemple d'utilisation
-d = 32*32*3        # Dimension de la sphère
-n_points = 60000  # Nombre de points à générer
+
+d = 32*32*3        # Dimension 
+n_points = 60000  # Number of points to generate
 
 data = points_sur_sphere_torch(d, n_points)
+# Very simple label: one hemisphere is label "0", the other is label "1"
 labels = torch.zeros(n_points,dtype = torch.long)
-# labels[torch.where(data[:,:16*32*3].sum(axis=1) < 0)] = 1
 labels[torch.where((data[:,0]<0))]  =1
-# labels[torch.where((data[:,0]>0)*(data[:,100]<0))]  =2
-# labels[torch.where((data[:,0]>0)*(data[:,100]>0))]  =3
-# labels[:16*32*3]=1
+
+# Save dataset
 dataset = TensorDataset(data, labels)
 torch.save({'data': data, 'labels': labels}, '/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/dataset_sphere.pth')

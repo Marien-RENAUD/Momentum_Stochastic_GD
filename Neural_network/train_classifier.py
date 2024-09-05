@@ -20,6 +20,8 @@ parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
+parser.add_argument('--lr', type=float, default = 0.01)
+parser.add_argument('--momentum', type=float, default = 0.9)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -45,22 +47,22 @@ if network_type == "CNN":# Light CNN architecture
 
 criterion = nn.CrossEntropyLoss()
 
-momentum = None
+momentum = hparams.momentum
 alg = hparams.alg
-
-if alg == "SGD" or alg == "SNAG":
-    lr = 0.01
-if alg == "GD":
-    lr = 2
-if alg == "NAG":
-    lr = 1
+lr = hparams.lr
+# if alg == "SGD" or alg == "SNAG":
+#     lr = 0.1
+# if alg == "GD":
+#     lr = 2
+# if alg == "NAG":
+#     lr = 1
 
 
 if alg == "SGD" or alg == "GD":
     optimizer = torch.optim.SGD(net.parameters(), lr = lr)
-
+print("lr = ",lr, "momentum = ", momentum)
 if alg == "SNAG" or alg == "NAG":
-    momentum = 0.9
+    # momentum = 0.7
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum, nesterov = "True")
 
 batch_size_train = 64
@@ -204,12 +206,14 @@ dict_results = {
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
 dict_loss = {"loss_trajectory" : loss_trajectory}
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+'_'
-torch.save(dict_results, save_name+'dict_results.pth')
-torch.save(dict_loss, save_name+'dict_loss.pth')
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) 
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
+# torch.save(dict_results, save_name+'_dict_results.pth')
+# torch.save(dict_loss, save_name+'_dict_loss.pth')
 print("Model save in the adress : "+save_name+'dict_results.pth')
 
 plt.plot(loss_trajectory)
+plt.title(str(100 * test_correct / (len(test_loader) * batch_size_test)))
 plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
 plt.savefig(save_name+"training_trajectory.png")
