@@ -1,8 +1,8 @@
 
-for lr in 0.09 0.11 0.13
+for lr in 0.01 0.05 0.1 0.15
 do
-    for momentum in 0.65 0.7 0.75 0.8 0.85
+    for momentum in 0.6 0.7 0.8 0.9
     do
-        python train_classifier.py --n_epoch 10 --alg "SNAG" --lr $lr --momentum $momentum --device 1
+        python train_classifier.py --alg "SNAG" --lr $lr --momentum $momentum --device 1 --data "SPHERE" --grid_search True
     done
 done
