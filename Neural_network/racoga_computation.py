@@ -19,6 +19,7 @@ parser.add_argument('--step', type=int, default = 100, help = "interval between 
 parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
+parser.add_argument('--seed', type=int, default = 42)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -29,6 +30,7 @@ n_epoch = hparams.n_epoch
 alg = hparams.alg
 momentum = hparams.momentum
 lr = hparams.lr
+current_seed = hparams.seed
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -49,7 +51,7 @@ train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transfor
 
 # Load results
 path_results = "results/"
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) 
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + '_seed_' + str(current_seed)
 dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  +suffix +'_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
