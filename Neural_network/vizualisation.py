@@ -6,7 +6,6 @@ import pandas as pd
 root = 'results/'
 setting = "_n_epoch_5_batch_random_with_rpl_alg_"
 list_net = ['MLP','CNN']
-list_net = ['CNN']
 list_param = ['_lr_0.15_momentum_0.0_seed_','_lr_0.05_momentum_0.85_seed_','_lr_1.0_momentum_0.6_seed_42','_lr_1.0_momentum_0.0_seed_42']
 list_seed=['40','41','42']
 size_vec = len(torch.load(root + list_net[0] + setting  + "SGD" + list_param[0] + list_seed[0] + "_dict_loss.pth")["loss_trajectory"])
