@@ -17,6 +17,8 @@ parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--step', type=int, default = 100, help = "interval between each RACOGA computation")
 parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
+parser.add_argument('--lr', type=float, default = 0.01)
+parser.add_argument('--momentum', type=float, default = 0.9)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -25,6 +27,8 @@ batch_sample = hparams.batch_sample
 network_type = hparams.network_type
 n_epoch = hparams.n_epoch
 alg = hparams.alg
+momentum = hparams.momentum
+lr = hparams.lr
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -45,7 +49,8 @@ train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transfor
 
 # Load results
 path_results = "results/"
-dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg + '_dict_results.pth'
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) 
+dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  +suffix +'_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]

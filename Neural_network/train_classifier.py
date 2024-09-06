@@ -22,6 +22,8 @@ parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
+parser.add_argument('--seed', type=int, default = 42)
+parser.add_argument('--grid_search', type=bool, default = False, choices = [True, False])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -33,9 +35,9 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
-set_seed(42)
-
+current_seed = hparams.seed
+set_seed(current_seed)
+grid_search = hparams.grid_search
 # define network structure 
 network_type = hparams.network_type
 
@@ -192,6 +194,45 @@ print('End of testing. Test accuracy {:.2f}%'.format(
 
 # Save the training loss
 path_results = "results/"
+if grid_search == True:
+    path_results = os.path.join(path_results, "grid_search")
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    path_results = os.path.join(path_results, data_choice)
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    path_results = os.path.join(path_results, alg)
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    if alg == "SGD" or alg == "GD":
+        path_results = os.path.join(path_results, 'lr_' +  str(lr)) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
+    else:
+        name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
+        path_results = os.path.join(path_results, str(lr)) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
+else:
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    path_results = os.path.join(path_results, data_choice)
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    path_results = os.path.join(path_results, alg)
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+    if alg == "SGD" or alg == "GD":
+        path_results = os.path.join(path_results, 'lr_' +  str(lr)) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
+    else:
+        name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
+        path_results = os.path.join(path_results, str(lr)) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
 
 # Save the training trajectory in a torch dictionary
 dict_results = {
@@ -206,14 +247,15 @@ dict_results = {
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
 }
 dict_loss = {"loss_trajectory" : loss_trajectory}
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) 
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
-# torch.save(dict_results, save_name+'_dict_results.pth')
-# torch.save(dict_loss, save_name+'_dict_loss.pth')
+if grid_search == False:
+    torch.save(dict_results, save_name+'_dict_results.pth')
+    torch.save(dict_loss, save_name+'_dict_loss.pth')
 print("Model save in the adress : "+save_name+'dict_results.pth')
 
 plt.plot(loss_trajectory)
-plt.title(str(100 * test_correct / (len(test_loader) * batch_size_test)))
+plt.title("Test accuracy : " +  str(100 * test_correct / (len(test_loader) * batch_size_test)))
 plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
 plt.savefig(save_name+"training_trajectory.png")
