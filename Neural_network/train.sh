@@ -11,11 +11,11 @@
 #     done
 # done
 
-#python train_classifier.py --lr 1 --alg "NAG" --device 1 --momentum 0.6
+python train_classifier.py --lr 2 --alg "NAG" --device 1 --momentum 0.6 --network_type "MLP" --data "SPHERE"
 
-#python train_classifier.py --lr 1 --alg "GD" --device 1 --momentum 0
+python train_classifier.py --lr 3 --alg "GD" --device 1 --momentum 0 --network_type "MLP" --data "SPHERE"
 for seed in 40 41 42
 do
-#    python train_classifier.py --lr 0.05 --alg "SNAG" --device 1 --momentum 0.85 --seed $seed
-    python train_classifier.py --lr 0.15 --alg "SGD" --device 1 --momentum 0 --seed $seed
+    python train_classifier.py --lr 0.05 --alg "SNAG" --device 1 --momentum 0.9 --seed $seed --network_type "MLP" --data "SPHERE"
+    python train_classifier.py --lr 0.15 --alg "SGD" --device 1 --momentum 0 --seed $seed --network_type "MLP" --data "SPHERE"
 done

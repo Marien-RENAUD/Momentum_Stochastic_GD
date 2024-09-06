@@ -212,7 +212,7 @@ if grid_search == True:
             os.mkdir(path_results)
     else:
         name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
-        path_results = os.path.join(path_results, str(lr)) 
+        path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
 else:
@@ -248,7 +248,7 @@ dict_results = {
 }
 dict_loss = {"loss_trajectory" : loss_trajectory}
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
+save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 if grid_search == False:
     torch.save(dict_results, save_name+'_dict_results.pth')
     torch.save(dict_loss, save_name+'_dict_loss.pth')
