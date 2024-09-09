@@ -7,7 +7,7 @@ import torchvision.transforms as t
 #     return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 10))
 
 def create_mlp():
-    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.Softplus(), nn.Linear(128, 64),  nn.Softplus(), nn.Linear(64, 2))
+    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 2))
 
 def create_cnn():
     net = nn.Sequential(

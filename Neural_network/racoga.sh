@@ -9,7 +9,7 @@
 for seed in 38 39 40 41 42
 do
     python racoga_computation.py --lr 0.1 --alg "SNAG" --device 1 --momentum 0.9 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
-    python racoga_computation.py --lr 0.4 --alg "SGD" --device 1 --momentum 0 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
-    python racoga_computation.py --lr 0.5 --alg "NAG" --device 1 --momentum 0.9 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
-    python racoga_computation.py --lr 1 --alg "GD" --device 1 --momentum 0 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
+    python racoga_computation.py --lr 0.3 --alg "SGD" --device 1 --momentum 0 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
+    python racoga_computation.py --lr 2 --alg "NAG" --device 1 --momentum 0.9 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
+    python racoga_computation.py --lr 3 --alg "GD" --device 1 --momentum 0 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 10
 done
