@@ -264,14 +264,15 @@ plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
 plt.savefig(save_name+"training_trajectory.png")
 
-path_results = "results/"
-dict_loss = {"loss_trajectory" : loss_trajectory}
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 if grid_search == False:
-    torch.save(dict_results, save_name+'_dict_results.pth')
-    torch.save(dict_loss, save_name+'_dict_loss.pth')
-print("Model save in the adress : "+save_name+'dict_results.pth')
+    path_results = "results/"
+    dict_loss = {"loss_trajectory" : loss_trajectory}
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+    save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
+    if grid_search == False:
+        torch.save(dict_results, save_name+'_dict_results.pth')
+        torch.save(dict_loss, save_name+'_dict_loss.pth')
+    print("Model save in the adress : "+save_name+'dict_results.pth')
 
 
 # Save info
