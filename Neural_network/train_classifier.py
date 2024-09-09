@@ -200,8 +200,6 @@ if grid_search == True:
     path_results = os.path.join(path_results, "grid_search")
     if not os.path.exists(path_results):
         os.mkdir(path_results)
-    if not os.path.exists(path_results):
-        os.mkdir(path_results)
     path_results = os.path.join(path_results, data_choice)
     if not os.path.exists(path_results):
         os.mkdir(path_results)
@@ -236,17 +234,21 @@ else:
         if not os.path.exists(path_results):
             os.mkdir(path_results)
 
+duration = time.time() - start
 # Save the training trajectory in a torch dictionary
 dict_results = {
     "weights_trajectory" : weights_trajectory,
     "loss_trajectory" : loss_trajectory,
     "network_type"  : network_type,
+    "dataset" : data_choice,
     "batch_sample" : batch_sample,
     "n_epoch" : n_epoch,
     "batch_size" : batch_size,
     "momentum" : momentum,
     "lr" : lr,
     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
+    "train_loss" : train_loss,
+    "computation_time" : duration
 }
 dict_loss = {"loss_trajectory" : loss_trajectory}
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
@@ -262,16 +264,15 @@ plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
 plt.savefig(save_name+"training_trajectory.png")
 
-path_results = "results/"
-dict_loss = {"loss_trajectory" : loss_trajectory}
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
-if grid_search == False:
-    torch.save(dict_results, save_name+'_dict_results.pth')
-    torch.save(dict_loss, save_name+'_dict_loss.pth')
-print("Model save in the adress : "+save_name+'dict_results.pth')
+# path_results = "results/"
+# dict_loss = {"loss_trajectory" : loss_trajectory}
+# suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+# save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
+# if grid_search == False:
+#     torch.save(dict_results, save_name+'_dict_results.pth')
+#     torch.save(dict_loss, save_name+'_dict_loss.pth')
+# print("Model save in the adress : "+save_name+'dict_results.pth')
 
-duration = time.time() - start
 
 # Save info
 log_print = ''
@@ -281,5 +282,5 @@ else:
     log_print += '\ntraining : '
 log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
-fichier.write("log_print")
+fichier.write(log_print)
 fichier.close()
