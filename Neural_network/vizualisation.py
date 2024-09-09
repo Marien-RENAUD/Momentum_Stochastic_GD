@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 root = 'results/'
-setting = "_n_epoch_10_batch_random_with_rpl_alg_"
+setting = "_n_epoch_5_batch_random_with_rpl_alg_"
 list_net = ['CNN', 'MLP']
-i = 1
-list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.1_momentum_0.9_seed_','_lr_2.0_momentum_0.9_seed_','_lr_3.0_momentum_0.0_seed_']
+i = 0
+list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.05_momentum_0.9_seed_','_lr_2.0_momentum_0.7_seed_','_lr_4.0_momentum_0.0_seed_']
 list_seed=['38', '39', '40','41','42']
 nb_seed = len(list_seed)
 size_vec = len(torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_dict_loss.pth")["loss_trajectory"])
@@ -100,7 +100,7 @@ plt.hist(racoga_trajectory_sgd[:3911],bins="sqrt",edgecolor=None,facecolor = "bl
 plt.hist(racoga_trajectory_snag[:3911],bins="sqrt",edgecolor=None,facecolor = "blue",density = True,alpha = 0.5,label = "SNAG")
 plt.hist(racoga_trajectory_gd[:6],bins="sqrt",edgecolor=None,facecolor = "purple",density = True,alpha = 0.5,label = "GD")
 plt.hist(racoga_trajectory_nag[:6],bins="sqrt",edgecolor=None,facecolor = "red",density = True,alpha = 0.5,label = "NAG")
-plt.xticks((-0.5,200),["-0.5","200"], fontsize = number_size)
+plt.xticks((-0.5,150),["-0.5","150"], fontsize = number_size)
 plt.yticks((0,0.08), ["0","0.08"], fontsize = number_size)
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
 # plt.yticks((np.array(racoga_trajectory_snag,dtype = np.float32).min(),np.array(racoga_trajectory_snag,dtype = np.float32).max()))
