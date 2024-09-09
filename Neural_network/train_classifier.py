@@ -11,7 +11,9 @@ from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
 from utils import sort_batches
 from utils import calculate_training_loss
+import time as time
 
+start = time.time()
 # Define Parser arguments
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
@@ -188,9 +190,9 @@ for i, (batch, targets) in enumerate(test_loader):
     targets = targets.to(device)
     pred = output.max(1, keepdim=True)[1]
     test_correct += pred.eq(targets.view_as(pred)).sum().item()
-    
+test_accur =  100 * test_correct / (len(test_loader) * batch_size_test)
 print('End of testing. Test accuracy {:.2f}%'.format(
-    100 * test_correct / (len(test_loader) * batch_size_test)))
+  test_accur))
 
 # Save the training loss
 path_results = "results/"
@@ -230,7 +232,7 @@ else:
             os.mkdir(path_results)
     else:
         name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
-        path_results = os.path.join(path_results, str(lr)) 
+        path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
 
@@ -268,3 +270,16 @@ if grid_search == False:
     torch.save(dict_results, save_name+'_dict_results.pth')
     torch.save(dict_loss, save_name+'_dict_loss.pth')
 print("Model save in the adress : "+save_name+'dict_results.pth')
+
+duration = time.time() - start
+
+# Save info
+log_print = ''
+if grid_search == True:
+    log_print += '\ngrid_search : '
+else:
+    log_print += '\ntraining : '
+log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+fichier = open("log_file.txt", "a")
+fichier.write("log_print")
+fichier.close()
