@@ -68,3 +68,24 @@ training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9,
 training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(761.7070, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 63.4156050955414. Computation time : 73.94987368583679
 training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2811, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 20.83996815286624. Computation time : 78.3957724571228
 training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2801, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 21.407245222929937. Computation time : 78.65249347686768
+
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 312.11970686912537
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 316.75186944007874
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 40.81436586380005
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 40.55940890312195
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 319.0887370109558
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 314.0661234855652
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 40.432045221328735
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 40.733818769454956
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 318.4528203010559
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 321.67312574386597
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 40.68429088592529
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 40.53541135787964
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 313.20261096954346
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 308.6581840515137
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 40.890798568725586
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 40.34114718437195
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 314.8289155960083
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 311.23887491226196
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 41.10041546821594
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 41.29839634895325

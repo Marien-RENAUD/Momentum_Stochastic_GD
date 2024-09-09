@@ -9,6 +9,8 @@ from time import time
 from tqdm import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
+import time as time
+
 start = time.time()
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
@@ -20,6 +22,7 @@ parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -31,6 +34,7 @@ alg = hparams.alg
 momentum = hparams.momentum
 lr = hparams.lr
 current_seed = hparams.seed
+data_choice = hparams.data
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -155,8 +159,8 @@ np.save(save_name+'_racoga_results.npy', dict)
 # plt.savefig(save_name+"_racoga_evolution.png")
 
 # Save info
-log_print = 'racoga : '
-log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+log_print = '\nracoga : '
+log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)
 fichier.close()
