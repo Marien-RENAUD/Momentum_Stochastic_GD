@@ -176,3 +176,9 @@ training : datset = SPHERE, n_epoch = 10, alg = SGD, lr = 0.4, momentum = 0.0, f
 training : datset = SPHERE, n_epoch = 10, alg = NAG, lr = 0.5, momentum = 0.9, final training loss : tensor(0.6938, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 50.69665605095541. Computation time : 6.750769376754761
 training : datset = SPHERE, n_epoch = 10, alg = GD, lr = 1.0, momentum = 0.0, final training loss : tensor(0.7295, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.02468152866242. Computation time : 6.76116418838501
 ""
+
+grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.6, final training loss : tensor(541.1122, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 14.42722487449646
+grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.7, final training loss : tensor(538.8569, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.07364649681529. Computation time : 14.425331115722656
+grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.8, final training loss : tensor(292.8484, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 81.25995222929936. Computation time : 14.401968002319336
+grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.9, final training loss : tensor(82.1848, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.98885350318471. Computation time : 14.041070938110352
+grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.05, momentum = 0.6, final training loss : tensor(143.0488, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 92.81449044585987. Computation time : 14.317289352416992
