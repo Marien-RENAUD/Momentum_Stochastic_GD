@@ -9,7 +9,7 @@ from time import time
 from tqdm import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
-
+start = time.time()
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
@@ -137,17 +137,26 @@ else:
         racoga = scalar_prod/sum_gradient_norm
         racoga_list.append(racoga.detach().cpu().numpy())
         scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
-
+duration = time.time() - start
 #Save the RACOGA evolution
 dict = {
     "racoga_list" : racoga_list,
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
+    "computation_time" : duration
 }
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
 np.save(save_name+'_racoga_results.npy', dict)
 
-plt.plot(iteration_list, racoga_list)
-plt.xlabel("number of iterations")
-plt.ylabel("RACOGA")
-plt.savefig(save_name+"_racoga_evolution.png")
+# plt.plot(iteration_list, racoga_list)
+# plt.xlabel("number of iterations")
+# plt.ylabel("RACOGA")
+# plt.savefig(save_name+"_racoga_evolution.png")
+
+# Save info
+log_print = 'racoga : '
+log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+fichier = open("log_file.txt", "a")
+fichier.write(log_print)
+fichier.close()
