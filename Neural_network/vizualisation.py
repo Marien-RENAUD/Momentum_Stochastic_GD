@@ -77,11 +77,13 @@ plt.subplot(121)
 nb_gd_eval_det = torch.arange(0,782*5 +1 ,782)
 plt.plot(loss_trajectory_sgd,label = "SGD",c = "black")
 plt.plot(loss_trajectory_snag,label = "SNAG",c = "blue")
-plt.plot(nb_gd_eval_det,loss_trajectory_gd,label = "GD",c = "purple")
-plt.plot(nb_gd_eval_det,loss_trajectory_nag,label = "NAG",c = "red")
-plt.xticks((0,782*5 +1))
-plt.yticks((np.array(loss_trajectory_snag,dtype = np.float32).min(),np.array(loss_trajectory_snag,dtype = np.float32).max()))
-plt.legend()
+plt.plot(nb_gd_eval_det,loss_trajectory_nag,label = "NAG",c = "red",lw=3)
+plt.plot(nb_gd_eval_det,loss_trajectory_gd,label = "GD",c = "purple",lw=3,linestyle="--")
+
+plt.xticks((0,782*5 +1), fontsize = number_size)
+plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
+plt.yticks((np.array(loss_trajectory_snag,dtype = np.float32).min(),np.array(loss_trajectory_snag,dtype = np.float32).max()), fontsize = number_size)
+plt.legend(fontsize = legend_size)
 plt.subplot(122)
 
 nb_gd_eval_det = torch.arange(0,782*5  ,782)*0.01
@@ -96,10 +98,11 @@ plt.hist(racoga_trajectory_sgd,bins="sqrt",edgecolor=None,facecolor = "black",de
 plt.hist(racoga_trajectory_snag,bins="sqrt",edgecolor=None,facecolor = "blue",density = True,alpha = 0.5,label = "SNAG")
 plt.hist(racoga_trajectory_gd,bins="sqrt",edgecolor=None,facecolor = "purple",density = True,alpha = 0.5,label = "GD")
 plt.hist(racoga_trajectory_nag,bins="sqrt",edgecolor=None,facecolor = "red",density = True,alpha = 0.5,label = "NAG")
-plt.xticks((-1,150))
-plt.yticks((0,0.05))
+plt.xticks((-1,150), fontsize = number_size)
+plt.yticks((0,0.05), fontsize = number_size)
+plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
 # plt.yticks((np.array(racoga_trajectory_snag,dtype = np.float32).min(),np.array(racoga_trajectory_snag,dtype = np.float32).max()))
-plt.legend()
+plt.legend(fontsize = legend_size)
 
 plt.savefig("figures/alg_cv_" + list_net[i] + ".png")
 
