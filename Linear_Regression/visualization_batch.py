@@ -75,19 +75,19 @@ labelpad = 2
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
 plt.xticks((0,n_iter*batch_size[0]), fontsize = number_size)
-plt.yticks((-10,20), fontsize = number_size)
+plt.yticks((12,20), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.subplot(122)
 min_hist = np.nan
 max_hist = np.nan
 for j in range(nb_rho):
     col = (0.3, 0.6, 1 - 0.8*(j)/nb_rho ) 
-    plt.hist(racoga[index[j+3]],bins=np.linspace(racoga[index[j+3]].min(),racoga[index[j+3]].max(),50),edgecolor="black",facecolor = col,label = labels[j+3],density = True,alpha = 0.5)
+    plt.hist(racoga[index[j+3]],bins="sqrt",edgecolor=None,facecolor = col,label = labels[3+j],density = True,alpha = 0.5)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
-plt.xticks((-0.2,0,0.2),["-0.2", "0", "0.2"], fontsize = number_size)
+plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
 # plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-plt.yticks((0,20), fontsize = number_size)
+plt.yticks((0,2), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
 
