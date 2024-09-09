@@ -84,7 +84,7 @@ plt.plot(nb_gd_eval_det,loss_trajectory_gd[:6],label = "GD",c = "purple",lw=3,li
 
 plt.xticks((0,782*5 +1), fontsize = number_size)
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
-plt.yticks((0,1),["0","1"], fontsize = number_size)
+plt.yticks((0,2.5),["0","2.5"], fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.subplot(122)
 
@@ -101,7 +101,7 @@ plt.hist(racoga_trajectory_snag[:3911],bins="sqrt",edgecolor=None,facecolor = "b
 plt.hist(racoga_trajectory_gd[:6],bins="sqrt",edgecolor=None,facecolor = "purple",density = True,alpha = 0.5,label = "GD")
 plt.hist(racoga_trajectory_nag[:6],bins="sqrt",edgecolor=None,facecolor = "red",density = True,alpha = 0.5,label = "NAG")
 plt.xticks((-0.5,150),["-0.5","150"], fontsize = number_size)
-plt.yticks((0,0.08), ["0","0.08"], fontsize = number_size)
+plt.yticks((0,0.06), ["0","0.06"], fontsize = number_size)
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
 # plt.yticks((np.array(racoga_trajectory_snag,dtype = np.float32).min(),np.array(racoga_trajectory_snag,dtype = np.float32).max()))
 plt.legend(fontsize = legend_size)
