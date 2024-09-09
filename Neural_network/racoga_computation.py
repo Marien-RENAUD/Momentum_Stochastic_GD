@@ -53,6 +53,22 @@ flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
 train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
 
+data_choice = hparams.data
+if data_choice == "CIFAR10":
+    train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
+elif data_choice == "SPHERE":
+    # Sphere data
+    checkpoint = torch.load('../dataset/sphere/dataset_sphere.pth')
+    # Recreate the tensordataset
+    loaded_dataset = torch.utils.data.TensorDataset(checkpoint['data'], checkpoint['labels'])
+    train_size = int(5/6 * len(loaded_dataset))
+    test_size = len(loaded_dataset) - train_size
+    # Split dataset between training set and test set
+    train_dataset, test_dataset = torch.utils.data.random_split(loaded_dataset, [train_size, test_size])
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
+
+
 # Load results
 path_results = "results/"
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + '_seed_' + str(current_seed)

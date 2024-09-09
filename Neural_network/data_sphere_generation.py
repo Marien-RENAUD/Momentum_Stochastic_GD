@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+torch.manual_seed(42)
 def points_sur_sphere_torch(d, n_points):
     """
     Generate points uniformly distributed on the sphere.
@@ -28,4 +29,12 @@ labels[torch.where((data[:,0]<0))]  =1
 
 # Save dataset
 dataset = TensorDataset(data, labels)
-torch.save({'data': data, 'labels': labels}, '/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/dataset_sphere.pth')
+train_size = 50000
+test_size =  10000
+    # Split dataset between training set and test set
+torch.manual_seed(42)
+train_dataset, test_dataset = torch.utils.data.random_split(data, [train_size, test_size])
+torch.manual_seed(42)
+train_labels, test_labels = torch.utils.data.random_split(labels, [train_size, test_size])
+torch.save({'data': train_dataset, 'labels': train_labels}, '/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/train_dataset_sphere.pth')
+torch.save({'data': test_dataset, 'labels': test_labels}, '/beegfs/jhermant/Momentum_Stochastic_GD/dataset/sphere/test_dataset_sphere.pth')

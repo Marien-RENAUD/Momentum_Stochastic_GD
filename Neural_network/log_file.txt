@@ -91,6 +91,9 @@ racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Com
 racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 41.10041546821594
 racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 41.29839634895325
 
+
+### MAUVAISE ARCHITECTURE entre ""....""
+""
 grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.6, final training loss : tensor(541.3047, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 48.83558917197452. Computation time : 14.307974100112915
 grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.7, final training loss : tensor(536.7328, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 59.34514331210191. Computation time : 14.06183123588562
 grid_search : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.01, momentum = 0.8, final training loss : tensor(249.2986, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 87.85828025477707. Computation time : 13.787518739700317
@@ -172,3 +175,4 @@ training : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.1, momentum = 0.9, 
 training : datset = SPHERE, n_epoch = 10, alg = SGD, lr = 0.4, momentum = 0.0, final training loss : tensor(205.9715, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 67.66520700636943. Computation time : 13.803982257843018
 training : datset = SPHERE, n_epoch = 10, alg = NAG, lr = 0.5, momentum = 0.9, final training loss : tensor(0.6938, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 50.69665605095541. Computation time : 6.750769376754761
 training : datset = SPHERE, n_epoch = 10, alg = GD, lr = 1.0, momentum = 0.0, final training loss : tensor(0.7295, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.02468152866242. Computation time : 6.76116418838501
+""
