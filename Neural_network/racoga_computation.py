@@ -9,7 +9,9 @@ from time import time
 from tqdm import tqdm
 from models_architecture import create_mlp, create_cnn
 from argparse import ArgumentParser
+import time as time
 
+start = time.time()
 parser = ArgumentParser()
 parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
@@ -20,6 +22,7 @@ parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -31,6 +34,7 @@ alg = hparams.alg
 momentum = hparams.momentum
 lr = hparams.lr
 current_seed = hparams.seed
+data_choice = hparams.data
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -48,6 +52,17 @@ normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
 train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
+
+data_choice = hparams.data
+if data_choice == "CIFAR10":
+    train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
+elif data_choice == "SPHERE":
+    # Sphere data
+    checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
+    train_set = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
+
+
+
 
 # Load results
 path_results = "results/"
@@ -137,17 +152,26 @@ else:
         racoga = scalar_prod/sum_gradient_norm
         racoga_list.append(racoga.detach().cpu().numpy())
         scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
-
+duration = time.time() - start
 #Save the RACOGA evolution
 dict = {
     "racoga_list" : racoga_list,
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
+    "computation_time" : duration
 }
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg
+suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
 np.save(save_name+'_racoga_results.npy', dict)
 
-plt.plot(iteration_list, racoga_list)
-plt.xlabel("number of iterations")
-plt.ylabel("RACOGA")
-plt.savefig(save_name+"_racoga_evolution.png")
+# plt.plot(iteration_list, racoga_list)
+# plt.xlabel("number of iterations")
+# plt.ylabel("RACOGA")
+# plt.savefig(save_name+"_racoga_evolution.png")
+
+# Save info
+log_print = '\nracoga : '
+log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
+fichier = open("log_file.txt", "a")
+fichier.write(log_print)
+fichier.close()
