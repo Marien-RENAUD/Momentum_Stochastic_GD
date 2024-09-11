@@ -15,6 +15,20 @@ def features_gaussian(d, N, mean, generate_bias=False):
     features_matrix = torch.distributions.MultivariateNormal(mean, scale_tril= torch.tril(cov_matrix))
     return features_matrix.sample((N,)), bias
 
+def sphere_uniform(d, N):
+    """
+    Generate points uniformly distributed on the sphere.
+    
+    :param d: Dimension of the sphere.
+    :param N: Number of points to generate.
+    :return: Tensor whose shape is (n_points, d) each line is a point on the sphere.
+    """
+    points = torch.randn(N, d)
+    
+    points = points / points.norm(dim=1, keepdim=True)
+    bias = torch.normal(torch.rand(N) * 2 * N - N, torch.tensor([N]))
+    return points, bias
+
 def features_orthogonal(d,N,generate_lambda = False, generate_bias = False):
     if generate_lambda:
         lambda_vec = torch.distributions.Exponential(1).sample((N,))

@@ -14,8 +14,8 @@ d,N=1000,100 #choice of dimension d, number of functions N
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = torch.tensor([1,10,25]) #size of batch
 rho = 1*N/batch_size
-# rho = torch.tensor([0.25,0.5,1])*N/batch_size
-n_iter=1*10**4
+rho = torch.tensor([0.25,0.25,0.5])*N/batch_size
+n_iter=1*10**3
 
 
 if load_features:
@@ -24,20 +24,25 @@ if load_features:
 else:
     # gaussian features
     # mean = np.ones(d)*10
-    mean = torch.zeros(d)*1000
-    features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    nb_class = None
+    # mean = torch.zeros(d)*1000
+    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+    # nb_class = None
     
+    # uniform spherical
+    # mean = torch.zeros(d)
+    # features_matrix,bias = sphere_uniform(d, N)
+    # nb_class = None
+
     # gaussian mixture features
-    # nb_class = 10
-    # mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # # # nb_class = len(mean[:,0])
-    # if alternative_sampling == True:
-    #     features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
-    # else:
-    #     mixture_prob = np.ones(nb_class)/nb_class
-    #     # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-    #     features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
+    nb_class = 10
+    mean = torch.rand(nb_class,d) * 2 * d - d # random
+    # # nb_class = len(mean[:,0])
+    if alternative_sampling == True:
+        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    else:
+        mixture_prob = np.ones(nb_class)/nb_class
+        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
+        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
 
     # Orthogonal features
     # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
@@ -73,7 +78,7 @@ vec_norm= (features_matrix**2).sum(axis=1)
 arg_L_max = torch.argmax(vec_norm) 
 L_max = torch.max(vec_norm)
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
-labels = ["GD", "Mean-SGD", "NAG"]
+labels = ["GD", "SGD", "NAG"]
 print("N = ",N, "cond max = ", L_max/mu)
 print("NAG")
 f_nag,racoga_nag = NAG(x_0,mu,L,int(n_iter*batch_size[0]/N)+1,d,N,features_matrix,bias,return_racoga = True)
@@ -93,10 +98,10 @@ print("Debut SNAG")
 for i in range(nb_rho):  
     f_snag,b= SNAG(x_0,mu,L,rho[i],int(n_iter*batch_size[0]/batch_size[i])+1,n_sample,d,batch_size[i],N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
     print(f_snag.shape)
-    racoga['snag' + "batchsize=" + str(int(batch_size[i]))] = b 
-    algo['snag' + "batchsize=" + str(int(batch_size[i]))] = f_snag
-    labels.append("batchsize=" + str(int(batch_size[i])))
-    index.append('snag' + "batchsize=" + str(int(batch_size[i])))
+    racoga['snag' + "SNAG K=" + str(int(batch_size[i]))] = b 
+    algo['snag' + "SNAG K=" + str(int(batch_size[i]))] = f_snag
+    labels.append("SNAG K=" + str(int(batch_size[i])))
+    index.append('snag' + "SNAG K=" + str(int(batch_size[i])))
     print("SNAG", i)
 # i=0
 # rho = np.array([0.5,1])*N/batch_size

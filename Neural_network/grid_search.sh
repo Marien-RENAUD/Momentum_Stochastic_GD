@@ -27,3 +27,4 @@ do
         python train_classifier.py --alg "NAG" --lr $lr --momentum $momentum --device 1 --data "SPHERE" --grid_search True --network_type "MLP" --n_epoch 10
     done
 done
+python train_classifier.py --alg "SNAG" --lr 0.01 --momentum 0.8 --device 1 --data "SPHERE" --grid_search True --network_type "MLP" --n_epoch 10
