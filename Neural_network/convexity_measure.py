@@ -78,21 +78,81 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 # Computation of RACOGA
 ###
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
-
+batch_size = 128
 step = hparams.step # interval between each RACOGA computation
-racoga_list = []
+convexity_diff_list = []
 scalar_prod_list = []
 iteration_list = []
 
 if alg == "SGD" or alg == "SNAG":
-    for k in tqdm(range(len(weights_trajectory)//step)):
+    for k in tqdm(range((len(weights_trajectory)//step)-1)):
+        iteration_list.append(step*k)
+        x = weights_trajectory[step*k]
+        for j, param in enumerate(net.parameters()):
+            param.data = x[j].to(device)
+        sum_gradient = torch.tensor([]).to(device)
+        sum_loss_x = 0
+        for i, (batch, targets) in enumerate(post_process_loader):
+            batch = batch.to(device)
+            if network_type == "CNN":
+                batch_size = batch.size()[0]
+                batch = batch.view((batch_size, 3, 32, 32))
+            output = net(batch)
+            targets = targets.to(device)
+            loss = criterion(output, targets)
+
+            optimizer.zero_grad()
+            loss.backward()
+            #save gradients
+            gradient_i = torch.tensor([]).to(device)
+            
+            for param in net.parameters():
+                gradient_i = torch.cat((gradient_i,param.grad.flatten()))
+            if sum_gradient.size() != torch.Size([0]):
+                sum_gradient += gradient_i
+                sum_loss_x += loss.item() * batch_size
+            else:
+                sum_gradient = gradient_i
+                sum_loss_x = loss.item() * batch_size
+
+
+        iteration_list.append(step*k)
+        x_next = weights_trajectory[step*(k+1)]
+        for j, param in enumerate(net.parameters()):
+            param.data = x_next[j].to(device)
+        sum_loss_x_next = 0
+
+        for i, (batch, targets) in enumerate(post_process_loader):
+            batch = batch.to(device)
+            if network_type == "CNN":
+                batch_size = batch.size()[0]
+                batch = batch.view((batch_size, 3, 32, 32))
+            output = net(batch)
+            targets = targets.to(device)
+            loss = criterion(output, targets)
+
+            optimizer.zero_grad()
+            loss.backward()
+            
+            for param in net.parameters():
+                if sum_gradient.size() != torch.Size([0]):
+                    sum_loss_x_next += loss.item() * batch_size
+                else:
+                    sum_loss_x_next = loss.item() * batch_size
+            scalar_product = (sum_gradient[0]*(x[0] - x_next[0])).sum()
+            for j in range(len(x)):
+                scalar_product += (sum_gradient[j]*(x[j] - x_next[j])).sum()
+            convexity_diff = scalar_product + sum_loss_x - sum_loss_x_next
+            convexity_diff_list.append(convexity_diff.detach().cpu().numpy())
+else:
+    for k in tqdm(range(len(weights_trajectory))):
         iteration_list.append(step*k)
         x = weights_trajectory[step*k]
         for j, param in enumerate(net.parameters()):
             param.data = x[j].to(device)
         sum_gradient = torch.tensor([]).to(device)
         sum_gradient_norm = 0
-
+        sum_loss_x = 0
         for i, (batch, targets) in enumerate(post_process_loader):
             batch = batch.to(device)
             if network_type == "CNN":
@@ -106,26 +166,22 @@ if alg == "SGD" or alg == "SNAG":
             loss.backward()
             #save gradients
             gradient_i = torch.tensor([]).to(device)
+            
             for param in net.parameters():
                 gradient_i = torch.cat((gradient_i,param.grad.flatten()))
             if sum_gradient.size() != torch.Size([0]):
                 sum_gradient += gradient_i
-                sum_gradient_norm += torch.sum(gradient_i**2)
+                sum_loss_x += loss.item() * batch_size
             else:
                 sum_gradient = gradient_i
+                sum_loss_x = loss.item() * batch_size
 
-        scalar_prod = (1/2) * (torch.sum(sum_gradient**2) - sum_gradient_norm)
-        racoga = scalar_prod/sum_gradient_norm
-        racoga_list.append(racoga.detach().cpu().numpy())
-        scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
-else:
-    for k in tqdm(range(len(weights_trajectory))):
-        iteration_list.append(k)
-        x = weights_trajectory[k]
+
+        iteration_list.append(step*k)
+        x_next = weights_trajectory[step*(k+1)]
         for j, param in enumerate(net.parameters()):
-            param.data = x[j].to(device)
-        sum_gradient = torch.tensor([]).to(device)
-        sum_gradient_norm = 0
+            param.data = x_next[j].to(device)
+        sum_loss_x_next = 0
 
         for i, (batch, targets) in enumerate(post_process_loader):
             batch = batch.to(device)
@@ -138,39 +194,34 @@ else:
 
             optimizer.zero_grad()
             loss.backward()
-            #save gradients
-            gradient_i = torch.tensor([]).to(device)
+            
             for param in net.parameters():
-                gradient_i = torch.cat((gradient_i,param.grad.flatten()))
-            if sum_gradient.size() != torch.Size([0]):
-                sum_gradient += gradient_i
-                sum_gradient_norm += torch.sum(gradient_i**2)
-            else:
-                sum_gradient = gradient_i
+                if sum_gradient.size() != torch.Size([0]):
+                    sum_loss_x_next += loss.item() * batch_size
+                else:
+                    sum_loss_x_next = loss.item() * batch_size
+            scalar_product = (sum_gradient[0]*(x[0] - x_next[0])).sum()
+            for j in range(len(x)):
+                scalar_product += (sum_gradient[j]*(x[j] - x_next[j])).sum()
+            convexity_diff = scalar_product + sum_loss_x - sum_loss_x_next
+            convexity_diff_list.append(convexity_diff.detach().cpu().numpy())
 
-        scalar_prod = (1/2) * (torch.sum(sum_gradient**2) - sum_gradient_norm)
-        racoga = scalar_prod/sum_gradient_norm
-        racoga_list.append(racoga.detach().cpu().numpy())
-        scalar_prod_list.append(scalar_prod.detach().cpu().numpy())
 duration = time.time() - start
 #Save the RACOGA evolution
 dict = {
-    "racoga_list" : racoga_list,
+    "convexity_diff_list" : convexity_diff_list/60000,
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
     "computation_time" : duration
 }
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
-np.save(save_name+'_racoga_results.npy', dict)
+np.save(save_name+'_convexity_test_results.npy', dict)
 
-plt.plot(iteration_list, racoga_list)
-plt.xlabel("number of iterations")
-plt.ylabel("RACOGA")
-plt.savefig(save_name+"_racoga_evolution.png")
+
 
 # Save info
-log_print = '\nracoga : '
+log_print = '\nconvexity : '
 log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)
