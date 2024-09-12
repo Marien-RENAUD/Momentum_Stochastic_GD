@@ -292,3 +292,143 @@ training : datset = SPHERE, n_epoch = 11, alg = NAG, lr = 0.25, momentum = 0.9, 
 training : datset = SPHERE, n_epoch = 20, alg = NAG, lr = 0.25, momentum = 0.9, final training loss : tensor(0.6898, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 69.33718152866243. Computation time : 33.36298632621765
 training : datset = SPHERE, n_epoch = 20, alg = NAG, lr = 0.5, momentum = 0.9, final training loss : tensor(0.7000, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.58200636942675. Computation time : 33.71539378166199
 convexity : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 169.31091928482056
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(106.8088, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.70023885350318. Computation time : 8.136079788208008
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(371.8975, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 60.57921974522293. Computation time : 7.971086502075195
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6947, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 5.901167869567871
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6948, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.952026844024658
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(105.6697, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.50119426751593. Computation time : 8.175904273986816
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(370.3848, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 87.61942675159236. Computation time : 7.992668151855469
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6931, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 52.517914012738856. Computation time : 4.953572750091553
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6932, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.9805145263671875
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(102.0611, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.30214968152866. Computation time : 8.13075041770935
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(349.5483, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 59.82285031847134. Computation time : 8.007473945617676
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6937, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.974987745285034
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6956, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.994426250457764
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(543.1782, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 8.302101612091064
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(346.2193, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 74.42277070063695. Computation time : 8.018173456192017
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6933, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.975205421447754
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6933, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.967776536941528
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(104.9752, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.67038216560509. Computation time : 8.154100179672241
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(346.1379, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 91.40127388535032. Computation time : 8.01721739768982
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6945, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.97957181930542
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6948, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.942774295806885
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(110.1728, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 92.88415605095541. Computation time : 8.209007501602173
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(351.9748, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 89.30135350318471. Computation time : 8.371965885162354
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6934, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.956497669219971
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6935, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.964683294296265
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(109.7689, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.24243630573248. Computation time : 8.111281394958496
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(371.0383, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 80.38415605095541. Computation time : 7.894326448440552
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6931, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.960461378097534
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6932, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.976580381393433
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(105.5836, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 91.2718949044586. Computation time : 8.188069105148315
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(355.4703, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 90.11743630573248. Computation time : 8.08705997467041
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6935, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.98638916015625
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6938, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.95023885350319. Computation time : 4.957339763641357
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(100.0439, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 92.33678343949045. Computation time : 8.159266233444214
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(354.0699, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 85.22093949044586. Computation time : 8.014327764511108
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6935, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.966341257095337
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6936, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 4.983611822128296
+training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(109.0876, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.83957006369427. Computation time : 8.166467189788818
+training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(367.5032, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 87.25119426751593. Computation time : 8.156408548355103
+training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6931, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.960191082802545. Computation time : 4.959969758987427
+training : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0, final training loss : tensor(0.6931, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.97014331210191. Computation time : 4.9528422355651855
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(524.7246, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.89968152866243. Computation time : 58.28529906272888
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(717.3791, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 66.57046178343948. Computation time : 55.32878351211548
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2949, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 11.634156050955413. Computation time : 58.09792518615723
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2950, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 12.0421974522293. Computation time : 57.93768835067749
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(552.2994, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 71.66600318471338. Computation time : 56.79556965827942
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(763.3113, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 63.714171974522294. Computation time : 56.56557297706604
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2936, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 20.262738853503183. Computation time : 56.74720883369446
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2936, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 19.317277070063696. Computation time : 57.39369869232178
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(547.8424, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.85987261146497. Computation time : 55.550384521484375
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(729.3860, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 62.02229299363057. Computation time : 54.780781269073486
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2858, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 17.505971337579616. Computation time : 57.05870246887207
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2855, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 18.172770700636942. Computation time : 56.827800273895264
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(551.8365, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.49164012738854. Computation time : 56.30350923538208
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(748.3386, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 64.171974522293. Computation time : 54.92396807670593
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2710, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 20.581210191082803. Computation time : 56.695698976516724
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2688, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 20.173168789808916. Computation time : 57.55834245681763
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(526.8130, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 72.42237261146497. Computation time : 55.30915331840515
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(709.3033, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 66.01313694267516. Computation time : 55.98486542701721
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2823, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 19.556130573248407. Computation time : 57.62423515319824
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2817, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 19.46656050955414. Computation time : 57.71821141242981
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(536.6133, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.5015923566879. Computation time : 55.46651077270508
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(737.5604, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 64.31130573248407. Computation time : 54.956767559051514
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2949, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 17.197452229299362. Computation time : 57.5490939617157
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2953, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 19.128184713375795. Computation time : 57.20153880119324
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(542.8151, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.91958598726114. Computation time : 55.29469132423401
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(742.8963, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 67.30692675159236. Computation time : 55.7565712928772
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2932, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 17.41640127388535. Computation time : 57.0158326625824
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2934, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 16.968550955414013. Computation time : 57.72814226150513
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(539.0648, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 68.08320063694268. Computation time : 55.678903341293335
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(739.1458, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 66.1922770700637. Computation time : 55.79141974449158
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2902, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 14.132165605095542. Computation time : 57.00207042694092
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2902, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 15.047770700636942. Computation time : 57.84813976287842
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(535.2341, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 70.80015923566879. Computation time : 55.560906648635864
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(719.8276, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 67.20740445859873. Computation time : 55.57526445388794
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2983, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 11.554538216560509. Computation time : 58.23220753669739
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2985, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 13.70421974522293. Computation time : 57.70267605781555
+training : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9, final training loss : tensor(522.8973, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 71.17834394904459. Computation time : 55.84642791748047
+training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(745.0856, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 66.52070063694268. Computation time : 54.887614488601685
+training : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7, final training loss : tensor(2.2811, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 20.83996815286624. Computation time : 58.669944286346436
+training : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0, final training loss : tensor(2.2801, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 21.407245222929937. Computation time : 56.687891483306885
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 48.13434290885925
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 40.43908452987671
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.65320348739624
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.762322902679443
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 40.53484082221985
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 40.602123975753784
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.764498233795166
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.8457887172698975
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 45.46231651306152
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 50.03417658805847
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.82426905632019
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.631306886672974
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 51.416934967041016
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 49.52544951438904
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.658406019210815
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.635878562927246
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 48.04511904716492
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 48.22196817398071
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.843448162078857
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.861979722976685
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 48.66855239868164
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 49.70783543586731
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.859694719314575
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.905148267745972
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 44.84923768043518
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 46.68623638153076
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.770227432250977
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.877861261367798
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 43.858272314071655
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 40.98342847824097
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.892587184906006
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.845924377441406
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 41.00991773605347
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 39.612598180770874
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.840802192687988
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.893876791000366
+racoga : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 40.82062005996704
+racoga : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 42.00730776786804
+racoga : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9. Computation time : 5.879542827606201
+racoga : datset = SPHERE, n_epoch = 5, alg = GD, lr = 3.0, momentum = 0.0. Computation time : 5.77699875831604
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 310.27838039398193
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 314.5187997817993
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 42.02521753311157
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 41.89502453804016
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 307.64579224586487
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 311.6078476905823
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 41.5435791015625
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 41.230772733688354
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 317.9647636413574
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 310.2997941970825
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 41.78798818588257
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 41.710771560668945
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 316.9110498428345
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 321.4958231449127
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 42.25960326194763
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 42.572016954422
+racoga : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 319.55141019821167
+racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 311.10140466690063
+racoga : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 42.6793897151947
+racoga : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 42.15035820007324

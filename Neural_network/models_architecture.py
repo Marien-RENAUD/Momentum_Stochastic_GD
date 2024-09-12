@@ -3,12 +3,12 @@ import torchvision
 import torch.nn as nn
 import torchvision.transforms as t
 
-#Xp wide net
-def create_mlp():
-    return nn.Sequential(nn.Linear(3 * 32 * 32, 16384), nn.ReLU(), nn.Linear(16384, 10))
-
+# #Xp wide net
 # def create_mlp():
-#     return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 2))
+#     return nn.Sequential(nn.Linear(3 * 32 * 32, 16384), nn.ReLU(), nn.Linear(16384, 10))
+
+def create_mlp():
+    return nn.Sequential(nn.Linear(3 * 32 * 32, 128), nn.ReLU(), nn.Linear(128, 64),  nn.ReLU(), nn.Linear(64, 2))
 
 def create_cnn():
     net = nn.Sequential(
