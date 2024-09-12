@@ -292,6 +292,7 @@ training : datset = SPHERE, n_epoch = 11, alg = NAG, lr = 0.25, momentum = 0.9, 
 training : datset = SPHERE, n_epoch = 20, alg = NAG, lr = 0.25, momentum = 0.9, final training loss : tensor(0.6898, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 69.33718152866243. Computation time : 33.36298632621765
 training : datset = SPHERE, n_epoch = 20, alg = NAG, lr = 0.5, momentum = 0.9, final training loss : tensor(0.7000, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.58200636942675. Computation time : 33.71539378166199
 convexity : datset = SPHERE, n_epoch = 10, alg = SNAG, lr = 0.1, momentum = 0.9. Computation time : 169.31091928482056
+-- TRAINING AVEC 10 SEEDS -- 
 training : datset = SPHERE, n_epoch = 5, alg = SNAG, lr = 0.1, momentum = 0.9, final training loss : tensor(106.8088, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 93.70023885350318. Computation time : 8.136079788208008
 training : datset = SPHERE, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0, final training loss : tensor(371.8975, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 60.57921974522293. Computation time : 7.971086502075195
 training : datset = SPHERE, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.9, final training loss : tensor(0.6947, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 49.57205414012739. Computation time : 5.901167869567871
