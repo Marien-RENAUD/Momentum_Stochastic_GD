@@ -27,6 +27,11 @@ else:
     # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
     # nb_class = 2
 
+    # uniform spherical
+    # mean = torch.zeros(d)
+    # features_matrix,bias = sphere_uniform(d, N)
+    # nb_class = None
+
     # gaussian mixture features
     nb_class = 10
     mean = torch.rand(nb_class,d) * 2 * d - d # random
@@ -76,7 +81,7 @@ print("angle a_i : ", torch.sum(features_matrix[0,:]*features_matrix[1,:])/torch
 arg_L_max = torch.argmax(vec_norm) 
 L_max = torch.max(vec_norm)
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
-labels = ["GD", "Mean-SGD", "NAG"]
+labels = ["GD", "SGD", "NAG"]
 
 f_nag,racoga_nag = NAG(x_0,mu,L,int(n_iter*batch_size/N)+1,d,N,features_matrix,bias,return_racoga = True)
 f_gd,racoga_gd = GD(x_0,L,int(n_iter*batch_size/N)+1,d,N,features_matrix,bias,return_racoga = True)
@@ -90,10 +95,10 @@ np.save("nb_rho",nb_rho)
 f_i = np.empty((n_iter,nb_rho))
 for i in range(nb_rho):  
     f_snag,b= SNAG(x_0,mu,L,rho[i],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class,L_max=L_max)
-    racoga['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = b 
-    algo['snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k"] = f_snag
-    labels.append("SNAG " + r'$\rho = $' + str(float(rho[i])*batch_size/N) + "*N/k")
-    index.append('snag' + "rho = " + str(float(rho[i])*batch_size/N) + "*N/k")
+    racoga['snag' + "lambda = " + str(float(rho[i])*batch_size/N) + "*N"] = b 
+    algo['snag' + "lambda = " + str(float(rho[i])*batch_size/N) + "*N"] = f_snag
+    labels.append("SNAG " + r'$\lambda = $' + str(float(rho[i])*batch_size/N) + "N")
+    index.append('snag' + "lambda = " + str(float(rho[i])*batch_size/N) + "*N")
 # i=0
 # rho = np.array([0.5,1])*N/batch_size
 # f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)

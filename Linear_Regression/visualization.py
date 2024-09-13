@@ -9,7 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-features_type = 0
+# features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -61,15 +61,15 @@ vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_qu
 df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
 
 label_size = 20
-legend_size = 10
+legend_size = 15
 number_size = 15
-labelpad = 2
-
-plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad)
-plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad)
+labelpad_y = -20
+labelpad_x = 2
+plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad_x)
+plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad_y)
 plt.xticks((0,n_iter*batch_size), fontsize = number_size)
-plt.yticks((5,19), fontsize = number_size)
-plt.legend(fontsize = legend_size)
+plt.yticks((12,19), fontsize = number_size)
+plt.legend(loc = "lower left",fontsize = legend_size,frameon = False, bbox_to_anchor=(-0.01,-0.03))
 plt.subplot(122)
 min_hist = np.nan
 max_hist = np.nan
@@ -80,12 +80,12 @@ for j in range(nb_rho):
     # plt.hist(rho_hist,bins=np.linspace(rho_hist.min(),rho_hist.max(),100),edgecolor="white",facecolor = col,label = labels[3+j],density = True,alpha = 0.75)
     # print(rho_hist)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
-plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
-plt.xticks((-0.15,0,0.2),["-0.15", "0", "0.2"], fontsize = number_size)
+plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad_x)
+plt.xticks((-0.5,0,2.5),["-0.5", "0", "2.5"], fontsize = number_size)
 # plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-plt.yticks((0,20), fontsize = number_size)
+plt.yticks((0,2), fontsize = number_size)
 
-plt.legend(fontsize = legend_size)
+plt.legend(fontsize = legend_size,frameon = False)
 plt.savefig(path_figure_cv)
 
 

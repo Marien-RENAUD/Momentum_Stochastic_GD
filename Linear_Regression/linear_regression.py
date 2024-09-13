@@ -3,7 +3,7 @@ import numpy as np
 import numpy.random as nprandom
 
 rng = np.random.default_rng()
-# torch.set_default_dtype(torch.float64)
+
 def features_gaussian(d, N, mean, generate_bias=False):
     if generate_bias:
         bias = torch.normal(torch.rand(N) * 2 * N - N, torch.tensor([N]))
