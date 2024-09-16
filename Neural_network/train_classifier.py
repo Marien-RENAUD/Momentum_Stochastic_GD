@@ -20,10 +20,11 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM"])
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
+parser.add_argument('--beta_adam',type=float, default = 0.999)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--grid_search', type=bool, default = False, choices = [True, False])
 hparams = parser.parse_args()
@@ -54,6 +55,7 @@ criterion = nn.CrossEntropyLoss()
 momentum = hparams.momentum
 alg = hparams.alg
 lr = hparams.lr
+beta = hparams.beta_adam
 # if alg == "SGD" or alg == "SNAG":
 #     lr = 0.1
 # if alg == "GD":
@@ -68,7 +70,8 @@ print("lr = ",lr, "momentum = ", momentum)
 if alg == "SNAG" or alg == "NAG":
     # momentum = 0.7
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum, nesterov = "True")
-
+if alg == "ADAM":
+    optimizer = torch.optim.Adam(net.parameters(), lr = lr, betas = (momentum,beta))
 batch_size_train = 64
 if alg == "GD" or alg == "NAG":
     batch_size_train = 50000
