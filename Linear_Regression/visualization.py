@@ -9,7 +9,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-# features_type = 0
+features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -90,41 +90,54 @@ plt.savefig(path_figure_cv)
 
 
 
-plt.figure(figsize=(10,5))
-plt.subplot(221)
-plt.yticks((racoga["gd"].min(),0,racoga["gd"].max()))
-plt.plot(racoga["gd"],label = "GD",color="b")
-plt.plot(racoga["nag"],label = "NAG",color="r")
-plt.title("RACOGA condition along iterations",fontsize = 10)
-plt.legend()
-plt.subplot(222)
-plt.hist(racoga[index[1]],bins=np.linspace(racoga[index[1]].min(),racoga[index[1]].max(),50),edgecolor="black",facecolor = col,label = labels[1],density = True)
-
-for j in range(nb_rho):
-    col = (0.5, j/nb_rho ,1-j/nb_rho)
-    plt.hist(racoga[index[j+3]],bins=np.linspace(racoga[index[j+3]].min(),racoga[index[j+3]].max(),50),edgecolor="black",facecolor = col,label = labels[j+3],density = True,alpha = 1-(j)/nb_rho)
-plt.title("RACOGA condition number repartition for SNAG",fontsize=10)
-plt.legend()
-plt.subplot(223)
-# plt.plot(racoga[index[1]],label = labels[1],color=col)
+plt.figure(figsize=(5,5))
+legend_size = 10
+labelpad_y = -20
+labelpad_x = -10
+zero_vec = np.zeros(n_iter-N)
+nb_gd_eval_det = torch.arange(0,(n_iter)*batch_size,N)
+plt.yticks((-0.2,0,0.1), ["-0.2","0","0.1"],fontsize = number_size)
+plt.plot(nb_gd_eval_det,racoga["gd"],label = "GD",color="b",lw=3)
+plt.plot(nb_gd_eval_det,racoga["nag"],label = "NAG",color="r",lw=3)
 min_racoga, max_racoga = racoga[index[3]].min(), racoga[index[3]].max()
-
 for j in range(nb_rho):
     col = (0.5, j/nb_rho ,1-j/nb_rho)
-    plt.plot(racoga[index[j+3]],label = labels[j+3],color=col)
+    plt.plot(racoga[index[j+3]][:((n_iter)-(N))],label = labels[j+3],color=col,lw=2,alpha = 0.9)
     min_racoga, max_racoga = min(min_racoga, racoga[index[j+3]].min()), max(max_racoga, racoga[index[j+3]].max())
-plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
-plt.yticks((min_racoga,0,max_racoga))
-plt.legend()
+plt.plot(zero_vec,linestyle = "--", lw = 3, color = "black")
+plt.ylabel("RACOGA",fontsize = label_size, labelpad = labelpad_y)
+plt.xlabel("Gradient evaluations",fontsize = label_size,labelpad = labelpad_x)
+plt.xticks((0,900),fontsize = number_size)
+plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_racoga)
-fig, axs = plt.subplots(figsize = (20,3))
-table = axs.table(cellText = df_racoga.values,colLabels=df_racoga.columns,loc="center",rowLabels=df_racoga.index)
-axs.axis('off')
-table.scale(1, 2)
-table.auto_set_font_size(False)
-table.set_fontsize(13)
-axs.set_title("Table of statistics of racoga value along iterations",fontsize=13)
-# plt.tight_layout()
-plt.savefig(path_figure_racoga + 'table.png')
-print(L * param["rho"] > L_max )
-print(param["rho"]*L,L_max)
+# plt.subplot(222)
+# plt.hist(racoga[index[1]],bins=np.linspace(racoga[index[1]].min(),racoga[index[1]].max(),50),edgecolor="black",facecolor = col,label = labels[1],density = True)
+
+# for j in range(nb_rho):
+#     col = (0.5, j/nb_rho ,1-j/nb_rho)
+#     plt.hist(racoga[index[j+3]],bins=np.linspace(racoga[index[j+3]].min(),racoga[index[j+3]].max(),50),edgecolor="black",facecolor = col,label = labels[j+3],density = True,alpha = 1-(j)/nb_rho)
+# plt.title("RACOGA condition number repartition for SNAG",fontsize=10)
+# plt.legend()
+# plt.subplot(223)
+# # plt.plot(racoga[index[1]],label = labels[1],color=col)
+# min_racoga, max_racoga = racoga[index[3]].min(), racoga[index[3]].max()
+
+# for j in range(nb_rho):
+#     col = (0.5, j/nb_rho ,1-j/nb_rho)
+#     plt.plot(racoga[index[j+3]],label = labels[j+3],color=col)
+#     min_racoga, max_racoga = min(min_racoga, racoga[index[j+3]].min()), max(max_racoga, racoga[index[j+3]].max())
+# plt.title("RACOGA condition number along iterations of SNAG",fontsize=10)
+# plt.yticks((min_racoga,0,max_racoga))
+# plt.legend()
+# plt.savefig(path_figure_racoga)
+# fig, axs = plt.subplots(figsize = (20,3))
+# table = axs.table(cellText = df_racoga.values,colLabels=df_racoga.columns,loc="center",rowLabels=df_racoga.index)
+# axs.axis('off')
+# table.scale(1, 2)
+# table.auto_set_font_size(False)
+# table.set_fontsize(13)
+# axs.set_title("Table of statistics of racoga value along iterations",fontsize=13)
+# # plt.tight_layout()
+# plt.savefig(path_figure_racoga + 'table.png')
+# print(L * param["rho"] > L_max )
+# print(param["rho"]*L,L_max)

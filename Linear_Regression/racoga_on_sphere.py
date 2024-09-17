@@ -29,14 +29,14 @@ if data_type == "both":
     for i in range(n_ech):
         racoga[i] = racoga_computation(ech[i,:],N,features_matrix,bias)
     
-    plt.figure(figsize=(10,5))
-    plt.subplot(121)
+    plt.figure(figsize=(5,5))
     col = "deepskyblue"
     plt.hist(racoga,bins = "sqrt",edgecolor=None,facecolor = col,density = True,alpha = 1)
     plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad_x)
-    plt.xticks((-0.05,0,0.1),["-0.05", "0", "0.1"], fontsize = number_size)
+    plt.xticks((-0.05,0,0.15),["-0.05", "0", "0.15"], fontsize = number_size)
     plt.yticks((0,20), fontsize = number_size)
-
+    plt.savefig("figures/curvature/racoga_sphere.png")
+    plt.figure(figsize=(5,5))
     nb_class = 10
     mean = torch.rand(nb_class,d) * 2 * d - d # random
     mixture_prob = np.ones(nb_class)/nb_class
@@ -44,12 +44,13 @@ if data_type == "both":
     racoga = torch.empty(n_ech)
     for i in range(n_ech):
         racoga[i] = racoga_computation(ech[i,:],N,features_matrix,bias)
-    plt.subplot(122)
+
     plt.hist(racoga,bins = "sqrt",edgecolor=None,facecolor = col,density = True,alpha = 1)
     plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad_x)
     plt.xticks((0,4),["0", "4"], fontsize = number_size)
     plt.yticks((0,1), fontsize = number_size)
     plt.legend(fontsize = legend_size,frameon = False)
+    plt.savefig("figures/curvature/racoga_sphere_mixture.png")
 elif data_type == "sphere":
     mean = torch.zeros(d)
     features_matrix,bias = sphere_uniform(d, N)
@@ -60,6 +61,7 @@ elif data_type == "sphere":
         racoga[i] = racoga_computation(ech[i,:],N,features_matrix,bias)
     plt.figure(figsize=(5,5))
     plt.hist(racoga,bins = "sqrt")
+    plt.savefig("figures/curvature/racoga_sphere.png")
 else:
     nb_class = 10
     mean = torch.rand(nb_class,d) * 2 * d - d # random
@@ -71,4 +73,4 @@ else:
         racoga[i] = racoga_computation(ech[i,:],N,features_matrix,bias)
     plt.figure(figsize=(5,5))    
     plt.hist(racoga,bins = "sqrt")
-plt.savefig("figures/curvature/racoga_sphere.png")
+    plt.savefig("figures/curvature/racoga_sphere_mixture.png")
