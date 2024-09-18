@@ -213,8 +213,13 @@ if grid_search == True:
         path_results = os.path.join(path_results, 'lr_' +  str(lr)) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
-    else:
+    elif alg == "NAG" or alg == "SNAG":
         name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
+        path_results = os.path.join(path_results, name_dir) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
+    else:
+        name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum) + '_beta_' + str(beta)
         path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
@@ -254,7 +259,10 @@ dict_results = {
     "computation_time" : duration
 }
 dict_loss = {"loss_trajectory" : loss_trajectory}
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+if alg == "ADAM":
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+else:
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 # if grid_search == False:
 #     torch.save(dict_results, save_name+'_dict_results.pth')
@@ -270,7 +278,10 @@ plt.savefig(save_name+"training_trajectory.png")
 if grid_search == False:
     path_results = "results/"
     dict_loss = {"loss_trajectory" : loss_trajectory}
-    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+    if alg == "ADAM":
+        suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+    else:
+        suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
     save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
     if grid_search == False:
         torch.save(dict_results, save_name+'_dict_results.pth')
@@ -284,7 +295,10 @@ if grid_search == True:
     log_print += '\ngrid_search : '
 else:
     log_print += '\ntraining : '
-log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+if alg == "ADAM":
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', beta = ' + str(beta) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+else:
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)
 fichier.close()
