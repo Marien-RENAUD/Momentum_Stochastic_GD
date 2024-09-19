@@ -13,6 +13,8 @@ from utils import sort_batches
 from utils import calculate_training_loss
 import time as time
 
+#-- Code that compute RACOGA during training, in case of large model --#
+
 start = time.time()
 # Define Parser arguments
 parser = ArgumentParser()
@@ -30,7 +32,6 @@ hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
 
-#
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -54,19 +55,11 @@ criterion = nn.CrossEntropyLoss()
 momentum = hparams.momentum
 alg = hparams.alg
 lr = hparams.lr
-# if alg == "SGD" or alg == "SNAG":
-#     lr = 0.1
-# if alg == "GD":
-#     lr = 2
-# if alg == "NAG":
-#     lr = 1
-
 
 if alg == "SGD" or alg == "GD":
     optimizer = torch.optim.SGD(net.parameters(), lr = lr)
 print("lr = ",lr, "momentum = ", momentum)
 if alg == "SNAG" or alg == "NAG":
-    # momentum = 0.7
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum, nesterov = "True")
 
 batch_size_train = 64
@@ -93,19 +86,13 @@ if data_choice == "CIFAR10":
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
     post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 elif data_choice == "SPHERE":
-    # Sphere data
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     checkpoint_test = torch.load('../dataset/sphere/test_dataset_sphere.pth')
-    # Recreate the tensordataset
     train_dataset = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
     test_dataset = torch.utils.data.TensorDataset(checkpoint_test['data'], checkpoint_test['labels'])
-    # Split dataset between training set and test set
-
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
     post_process_loader = torch.utils.data.DataLoader(train_dataset, batch_size=128)
-
-
 
 def racoga_comput(weights_i,net,post_process_loader):
     x = weights_i
@@ -139,7 +126,6 @@ def racoga_comput(weights_i,net,post_process_loader):
     racoga = scalar_prod/sum_gradient_norm
     return racoga
 
-
 # To obtain non-homogeneous batches: batches that are composed of one class.
 batch_sample = hparams.batch_sample
 if batch_sample == "sort" or batch_sample == "random_sort":
@@ -151,8 +137,6 @@ if batch_sample == "random_with_rpl" or batch_sample == "random_sort":
 # TRAINING
 ###
 racoga = []
-# To save the trajectory
-weights_trajectory = []
 loss_trajectory = []
 if alg == "GD" or alg == "NAG":
     loss_trajectory.append(calculate_training_loss(net, train_loader, criterion, device,network_type,batch_size_train))
@@ -192,13 +176,11 @@ for epoch in range(n_epoch): # training loop
         loss.backward()
         optimizer.step()
 
-        #save the trajectory
+        # parameters
         weights_i = [param.data.clone() for param in net.parameters()]
-        # weights_trajectory.append(weights_i)
         loss_trajectory.append(loss.item())
 
         pred = output.max(1, keepdim=True)[1]
-        # print(pred)
         train_correct += pred.eq(targets.view_as(pred)).sum().item()
         train_loss += loss
 
@@ -271,21 +253,6 @@ else:
             os.mkdir(path_results)
 
 duration = time.time() - start
-# Save the training trajectory in a torch dictionary
-# dict_results = {
-#     "weights_trajectory" : weights_trajectory,
-#     "loss_trajectory" : loss_trajectory,
-#     "network_type"  : network_type,
-#     "dataset" : data_choice,
-#     "batch_sample" : batch_sample,
-#     "n_epoch" : n_epoch,
-#     "batch_size" : batch_size,
-#     "momentum" : momentum,
-#     "lr" : lr,
-#     "test_accuracy" : 100 * test_correct / (len(test_loader) * 64),
-#     "train_loss" : train_loss,
-#     "computation_time" : duration
-# }
 dict_results = {
     "racoga" : racoga,
     "loss_trajectory" : loss_trajectory,
@@ -303,19 +270,6 @@ dict_results = {
 dict_loss = {"loss_trajectory" : loss_trajectory}
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
-# if grid_search == False:
-#     torch.save(dict_results, save_name+'_dict_results.pth')
-#     torch.save(dict_loss, save_name+'_dict_loss.pth')
-# print("Model save in the adress : "+save_name+'dict_results.pth')
-# plt.figure(figsize=(10,5))
-# plt.subplot(121)
-# plt.plot(loss_trajectory)
-# plt.title("Test accuracy : " +  str(100 * test_correct / (len(test_loader) * batch_size_test)))
-# plt.xlabel("number of iterations")
-# plt.ylabel("Training Loss")
-# plt.subplot(122)
-# plt.plot(racoga)
-# plt.savefig(save_name+"training_trajectory.png")
 
 if grid_search == False:
     path_results = "results/"
@@ -326,7 +280,6 @@ if grid_search == False:
         torch.save(dict_results, save_name+'_dict_results.pth')
         torch.save(dict_loss, save_name+'_dict_loss.pth')
     print("Model save in the adress : "+save_name+'dict_results.pth')
-
 
 # Save info
 log_print = ''

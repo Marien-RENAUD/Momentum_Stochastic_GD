@@ -32,7 +32,7 @@ hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
 
-#
+# Set seed
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -42,15 +42,14 @@ def set_seed(seed):
 current_seed = hparams.seed
 set_seed(current_seed)
 grid_search = hparams.grid_search
+
 # define network structure 
 network_type = hparams.network_type
-
 if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
 if network_type == "CNN":# Light CNN architecture
     net = create_cnn().to(device)
-
 criterion = nn.CrossEntropyLoss()
 
 momentum = hparams.momentum
@@ -58,19 +57,11 @@ alg = hparams.alg
 lr = hparams.lr
 beta = hparams.beta_adam
 alpha = hparams.alpha_rms
-# if alg == "SGD" or alg == "SNAG":
-#     lr = 0.1
-# if alg == "GD":
-#     lr = 2
-# if alg == "NAG":
-#     lr = 1
-
 
 if alg == "SGD" or alg == "GD":
     optimizer = torch.optim.SGD(net.parameters(), lr = lr)
 print("lr = ",lr, "momentum = ", momentum)
 if alg == "SNAG" or alg == "NAG":
-    # momentum = 0.7
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum, nesterov = "True")
 if alg == "ADAM":
     optimizer = torch.optim.Adam(net.parameters(), lr = lr, betas = (momentum,beta))
@@ -99,19 +90,12 @@ if data_choice == "CIFAR10":
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
 elif data_choice == "SPHERE":
-    # Sphere data
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     checkpoint_test = torch.load('../dataset/sphere/test_dataset_sphere.pth')
-    # Recreate the tensordataset
     train_dataset = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
     test_dataset = torch.utils.data.TensorDataset(checkpoint_test['data'], checkpoint_test['labels'])
-    # Split dataset between training set and test set
-
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
-
-
-
 
 # To obtain non-homogeneous batches: batches that are composed of one class.
 batch_sample = hparams.batch_sample
@@ -149,7 +133,6 @@ for epoch in range(n_epoch): # training loop
             batch, targets = batch_shuffle[i].to(device), targets_shuffle[i].to(device)
         elif batch_sample == "random_sort":
             j = np.random.randint(len(batch_shuffle))
-            # print(j)
             batch, targets = batch_shuffle[j].to(device), targets_shuffle[j].to(device)
         else:
             batch, targets = batch.to(device), targets.to(device)
@@ -171,7 +154,6 @@ for epoch in range(n_epoch): # training loop
         loss_trajectory.append(loss.item())
 
         pred = output.max(1, keepdim=True)[1]
-        # print(pred)
         train_correct += pred.eq(targets.view_as(pred)).sum().item()
         train_loss += loss
 
@@ -282,11 +264,6 @@ else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 
-# if grid_search == False:
-#     torch.save(dict_results, save_name+'_dict_results.pth')
-#     torch.save(dict_loss, save_name+'_dict_loss.pth')
-# print("Model save in the adress : "+save_name+'dict_results.pth')
-
 plt.plot(loss_trajectory)
 plt.title("Test accuracy : " +  str(100 * test_correct / (len(test_loader) * batch_size_test)))
 plt.xlabel("number of iterations")
@@ -307,7 +284,6 @@ if grid_search == False:
         torch.save(dict_results, save_name+'_dict_results.pth')
         torch.save(dict_loss, save_name+'_dict_loss.pth')
     print("Model save in the adress : "+save_name+'dict_results.pth')
-
 
 # Save info
 log_print = ''
