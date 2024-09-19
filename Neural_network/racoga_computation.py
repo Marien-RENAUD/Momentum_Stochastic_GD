@@ -18,10 +18,11 @@ parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", cho
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--step', type=int, default = 100, help = "interval between each RACOGA computation")
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM","RMSprop"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
+parser.add_argument('--alpha_rms',type=float, default = 0.99)
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 parser.add_argument('--beta_adam',type=float, default = 0.999)
 hparams = parser.parse_args()
@@ -37,6 +38,7 @@ lr = hparams.lr
 current_seed = hparams.seed
 data_choice = hparams.data
 beta = hparams.beta_adam
+alpha = hparams.alpha_rms
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -48,6 +50,8 @@ if network_type == "CNN":# Light CNN architecture
 criterion = nn.CrossEntropyLoss()
 if alg == "ADAM":
     optimizer = torch.optim.Adam(net.parameters(), lr = lr, betas = (momentum,beta))
+elif alg == "RMSprop":
+    optimizer = torch.optim.RMSprop(net.parameters(), lr= lr, alpha = alpha)
 else:
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum) 
 
@@ -73,6 +77,8 @@ elif data_choice == "SPHERE":
 path_results = "results/"
 if alg == "ADAM":
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+elif alg == "RMSprop":
+    suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 
@@ -93,7 +99,7 @@ racoga_list = []
 scalar_prod_list = []
 iteration_list = []
 
-if alg == "SGD" or alg == "SNAG" or alg == "ADAM":
+if alg == "SGD" or alg == "SNAG" or alg == "ADAM" or alg == "RMSprop":
     for k in tqdm(range(len(weights_trajectory)//step)):
         iteration_list.append(step*k)
         x = weights_trajectory[step*k]
@@ -171,6 +177,8 @@ dict = {
 }
 if alg == "ADAM":
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+elif alg == "RMSprop":
+    suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 
@@ -186,6 +194,8 @@ plt.savefig(save_name+"_racoga_evolution.png")
 log_print = '\nracoga : '
 if alg == "ADAM":
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', beta = ' + str(beta) + '. Computation time : ' + str(duration)
+elif alg == "RMSprop":
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', alpha = ' + str(alpha) + '. Computation time : ' + str(duration)
 else:
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
