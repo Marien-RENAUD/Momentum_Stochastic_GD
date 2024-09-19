@@ -2,12 +2,14 @@ import numpy as np
 import numpy.random as nprandom
 import matplotlib.pyplot as plt
 import torch 
-from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
-## Où importer les modules?
+from linear_regression import *
+
 version_bis = False # Set true to not overwrite the first data experiment
 alternative_sampling = False
 load_features = False
-## data results folder
+
+features_type = 0 # Set 0 for gaussian features, 1 for uniform on the sphere features, 2 for gaussian-
+#-mixture features and 3 for orthogonal features
 
 d,N=1000,100 #choice of dimension d, number of functions N
 
@@ -22,31 +24,25 @@ if load_features:
     features = np.load("features.npy")
     features_matrix, bias = features["features_matrix"], features["bias"]
 else:
-    # gaussian features
-    # mean = np.ones(d)*10
-    # mean = torch.zeros(d)*1000
-    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    # nb_class = None
-    
-    # uniform spherical
-    # mean = torch.zeros(d)
-    # features_matrix,bias = sphere_uniform(d, N)
-    # nb_class = None
-
-    # gaussian mixture features
-    nb_class = 10
-    mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # # nb_class = len(mean[:,0])
-    if alternative_sampling == True:
-        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    if features_type == 0:
+        mean = torch.zeros(d)
+        features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+        nb_class = None
+    elif features_type == 1:
+        mean = torch.zeros(d)
+        features_matrix,bias = sphere_uniform(d, N)
+        nb_class = None
+    elif features_type == 2:
+        nb_class = 10
+        mean = torch.rand(nb_class,d) * 2 * d - d 
+        if alternative_sampling == True:
+            features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+        else:
+            mixture_prob = np.ones(nb_class)/nb_class
+            features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
     else:
-        mixture_prob = np.ones(nb_class)/nb_class
-        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
-
-    # Orthogonal features
-    # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
-    # bias = torch.zeros(N)
+        features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
+        bias = torch.zeros(N)
 
 features = {"features_matrix" : features_matrix, "bias" : bias}
 np.save("features",features)
@@ -74,7 +70,6 @@ else:
 print("Conditionnement : ", mu/L)
 
 vec_norm= (features_matrix**2).sum(axis=1)
-# print("angle a_i : ", torch.sum(features_matrix[0,:]*features_matrix[1,:])/torch.sqrt((torch.sum(features_matrix[0,:]**2)*torch.sum(features_matrix[1,:]**2))))
 arg_L_max = torch.argmax(vec_norm) 
 L_max = torch.max(vec_norm)
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
@@ -103,23 +98,8 @@ for i in range(nb_rho):
     labels.append("SNAG K=" + str(int(batch_size[i])))
     index.append('snag' + "SNAG K=" + str(int(batch_size[i])))
     print("SNAG", i)
-# i=0
-# rho = np.array([0.5,1])*N/batch_size
-# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
-# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# i=1
-# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
-# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
-
 
 root = "simul_data/batch_" 
-
 if features_type == 0:
     suffixe = 'unbiased_'
 elif features_type == 1:

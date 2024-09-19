@@ -24,12 +24,12 @@ racoga = torch.load(root +"racoga_" + suffixe + "batch=" + str(nb_batch) + ".pth
 path_figure_cv = path_figure_root + 'convergence/d=' + str(param['d']) + '_N=_' + str(param['N']) + suffixe + '.png'
 path_figure_racoga = path_figure_root + "racoga/" + '_d=' + str(param['d']) + '_N=_' + str(param['N']) + suffixe + '.png'
 
-
-
 d, N , n_iter, batch_size ,mu , L, L_max = param["d"], param["N"],param["n_iter"], param["batch_size"], param["mu"], param["L"], param["L_max"]
-
 labels = torch.load(root + "labels_" + "batch=" + str(nb_batch) + ".pth")
 index = torch.load(root + "index_"+  "batch=" + str(nb_batch) +".pth")
+
+#-- Figures : Racoga convergence (subplot 1) and histograms (subplot 2) --#
+
 plt.figure(figsize=(10,5))
 plt.subplot(121)
 nb_alg = len(labels) 
@@ -57,8 +57,6 @@ for j in range(nb_alg):
             nb_gd_eval_sto = torch.arange(0,int((n_iter+1)*batch_size[0]),int(batch_size[ind_batch]))
         mean_alg,min_alg,max_alg = torch.mean(algo[index[j]],axis=1),torch.min(algo[index[j]],dim=1),torch.max(algo[index[j]],axis=1)    
         plt.plot(nb_gd_eval_sto,torch.log(mean_alg),label=labels[j],color =col,lw=3, alpha = 0.8)
-        # plt.plot(nb_gd_eval_sto,torch.log(min_alg[0]),color =col,linestyle ="--")
-        # plt.plot(nb_gd_eval_sto,torch.log(max_alg[0]),color =col,linestyle ="--")
         racoga_current = (racoga[index[j]] + (batch_size[ind_batch]-1)*(N - racoga[index[j]])/(N-1))/batch_size[ind_batch]
         ind_batch += 1
 
@@ -86,14 +84,11 @@ for j in range(nb_rho):
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad)
 plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
-# plt.xticks((-0.5,0,3),["-0.5", "0", "3"], fontsize = number_size)
 plt.yticks((0,2), fontsize = number_size)
 plt.legend(fontsize = legend_size)
 plt.savefig(path_figure_cv)
 
-
-
-
+#-- Figure : Racoga along iterations --#
 
 plt.figure(figsize=(10,5))
 plt.subplot(221)
@@ -111,9 +106,7 @@ for j in range(nb_rho):
 plt.title("RACOGA condition number repartition for SNAG",fontsize=10)
 plt.legend()
 plt.subplot(223)
-# plt.plot(racoga[index[1]],label = labels[1],color=col)
 min_racoga, max_racoga = racoga[index[3]].min(), racoga[index[3]].max()
-
 for j in range(nb_rho):
     col = (0.5, j/nb_rho ,1-j/nb_rho)
     racog = (racoga[index[j+3]] + (batch_size[j]-1)*(N - racoga[index[j+3]])/(N-1))/batch_size[j]
@@ -130,7 +123,4 @@ table.scale(1, 2)
 table.auto_set_font_size(False)
 table.set_fontsize(13)
 axs.set_title("Table of statistics of racoga value along iterations",fontsize=13)
-# plt.tight_layout()
 plt.savefig(path_figure_racoga + 'table.png')
-print(L * param["rho"] > L_max )
-print(param["rho"]*L,L_max)

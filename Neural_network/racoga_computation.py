@@ -18,11 +18,12 @@ parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", cho
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--step', type=int, default = 100, help = "interval between each RACOGA computation")
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
+parser.add_argument('--beta_adam',type=float, default = 0.999)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -35,6 +36,7 @@ momentum = hparams.momentum
 lr = hparams.lr
 current_seed = hparams.seed
 data_choice = hparams.data
+beta = hparams.beta_adam
 # define network structure 
 
 if network_type == "MLP":# MLP architecture
@@ -44,7 +46,10 @@ if network_type == "CNN":# Light CNN architecture
     net = create_cnn().to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(net.parameters(), lr = 0.01, momentum=0.9) 
+if alg == "ADAM":
+    optimizer = torch.optim.Adam(net.parameters(), lr = lr, betas = (momentum,beta))
+else:
+    optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum) 
 
 #Dataset load
 to_tensor =  t.ToTensor()
@@ -66,7 +71,11 @@ elif data_choice == "SPHERE":
 
 # Load results
 path_results = "results/"
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + '_seed_' + str(current_seed)
+if alg == "ADAM":
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+else:
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+
 dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  +suffix +'_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
@@ -84,7 +93,7 @@ racoga_list = []
 scalar_prod_list = []
 iteration_list = []
 
-if alg == "SGD" or alg == "SNAG":
+if alg == "SGD" or alg == "SNAG" or alg == "ADAM":
     for k in tqdm(range(len(weights_trajectory)//step)):
         iteration_list.append(step*k)
         x = weights_trajectory[step*k]
@@ -160,7 +169,11 @@ dict = {
     "iteration_list" : iteration_list,
     "computation_time" : duration
 }
-suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+if alg == "ADAM":
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+else:
+    suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
 np.save(save_name+'_racoga_results.npy', dict)
 
@@ -171,6 +184,10 @@ plt.savefig(save_name+"_racoga_evolution.png")
 
 # Save info
 log_print = '\nracoga : '
+if alg == "ADAM":
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', beta = ' + str(beta) + '. Computation time : ' + str(duration)
+else:
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)

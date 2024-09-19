@@ -2,13 +2,14 @@ import numpy as np
 import numpy.random as nprandom
 import matplotlib.pyplot as plt
 import torch 
-from linear_regression import * ## Il y a des problèmes dans le code, les prompt ne marchent pas
-## Où importer les modules?
-# torch.set_default_dtype(torch.float64)
+from linear_regression import *
+
 version_bis = False # Set true to not overwrite the first data experiment
 load_features = False
 alternative_sampling = False
-## data results folder
+
+features_type = 0 # Set 0 for gaussian features, 1 for uniform on the sphere features, 2 for gaussian-
+#-mixture features and 3 for orthogonal features
 
 d,N = 1000,100#choice of dimension d, number of functions N
 
@@ -18,39 +19,31 @@ n_iter=1*10**3
 
 
 if load_features:
-    features = torch.load("features")
+    features = np.load("features.npy")
     features_matrix, bias = features["features_matrix"], features["bias"]
 else:
-
-    # gaussian features
-    # mean = torch.zeros(d)
-    # features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
-    # nb_class = 2
-
-    # uniform spherical
-    # mean = torch.zeros(d)
-    # features_matrix,bias = sphere_uniform(d, N)
-    # nb_class = None
-
-    # gaussian mixture features
-    nb_class = 10
-    mean = torch.rand(nb_class,d) * 2 * d - d # random
-    # mean = torch.eye(nb_class,d)*d**2
-    print(torch.matmul(mean,mean.t()))
-    if alternative_sampling == True:
-        features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+    if features_type == 0:
+        mean = torch.zeros(d)
+        features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
+        nb_class = None
+    elif features_type == 1:
+        mean = torch.zeros(d)
+        features_matrix,bias = sphere_uniform(d, N)
+        nb_class = None
+    elif features_type == 2:
+        nb_class = 10
+        mean = torch.rand(nb_class,d) * 2 * d - d 
+        if alternative_sampling == True:
+            features_matrix,bias = features_gaussian_mixture_det_rep(d,N,mean)  
+        else:
+            mixture_prob = np.ones(nb_class)/nb_class
+            features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
     else:
-        mixture_prob = np.ones(nb_class)/nb_class
-        # mean = (torch.diag(torch.cat((torch.ones(nb_class),torch.zeros(d-nb_class))))*500)[:nb_class,:] ### orthognal classes
-        features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
-
-    # Orthogonal features
-    # features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
-    # bias = torch.zeros(N)
+        features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
+        bias = torch.zeros(N)
 
 features = {"features_matrix" : features_matrix, "bias" : bias}
 torch.save(features,"features")
-
 
 if len(mean.shape)== 1: # 0 : unbiased, 2 : mixture
     features_type = 0
@@ -58,7 +51,6 @@ else:
     features_type = 1
 
 x_0 = torch.normal(torch.zeros(d),torch.ones(d))
-# x_0 = torch.ones(d)*d*10
 np.save("features_type",features_type)
 ## We compute L and mu using AA^T or AA^T, where A is the matrix feature, depending of which matrix is the largest
 ## and thus the easier to compute (the largest eigenvalue is the same for both cases)
@@ -71,7 +63,6 @@ else:
     mu = torch.min(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
-print("Conditionnement : ", mu/L)
 rho = torch.tensor([0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
 
 vec_norm= (features_matrix**2).sum(axis=1)
@@ -99,40 +90,20 @@ for i in range(nb_rho):
     algo['snag' + "lambda = " + str(float(rho[i])*batch_size/N) + "*N"] = f_snag
     labels.append("SNAG " + r'$\lambda = $' + str(float(rho[i])*batch_size/N) + "N")
     index.append('snag' + "lambda = " + str(float(rho[i])*batch_size/N) + "*N")
-# i=0
-# rho = np.array([0.5,1])*N/batch_size
-# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=False,nb_class=nb_class)
-# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# i=1
-# f_snag,b = SNAG(x_0,mu,L,rho[0],n_iter,n_sample,d,batch_size,N,features_matrix,bias,return_racoga = True,alternative_sampling=True,nb_class=nb_class)
-# racoga['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = b 
-# algo['snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k"] = f_snag
-# labels.append("rho = " + str(rho[i]*batch_size/N) + "*N/k")
-# index.append('snag' + "rho = " + str(rho[i]*batch_size/N) + "*N/k")
 
-print("average corelation", np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)].mean())
-print("variance norm : ", torch.std(vec_norm))
-print(np.where(np.dot(features_matrix,features_matrix.T)[np.triu_indices(N,1)]<0))
 root = "simul_data/" 
-
 if features_type == 0:
     suffixe = 'unbiased_'
 else:
     suffixe = 'gaussian_mixture_'
-
 param = {'d' : d, 'N' : N,'n_iter' : n_iter, 'batch_size' : batch_size, 'mu' : mu, 'L' : L, 'L_max' : L_max, 'L_sgd' : L_sgd, 'rho' : rho, 'nb_class' : nb_class}
 torch.save(param,root + "param_"+suffixe + 'rho='+ str(nb_rho) + ".pth") ### If not working, set working directory to /Linear_Regression
 torch.save(algo,root +"algo_"+suffixe+ 'rho='+ str(nb_rho)+ ".pth")
 torch.save(racoga,root +"racoga_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(labels),root +"labels_" + suffixe + 'rho='+ str(nb_rho)+ ".pth")
 torch.save(np.array(index),root +"index_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
-
 norm_grad = np.sqrt((features_matrix**2).sum(axis= 1)).reshape(N,1)
 vec_corr = (np.dot(features_matrix,features_matrix.T)/(norm_grad*norm_grad.T))[np.triu_indices(N,1)]
 torch.save(vec_corr.mean(),root +"corr_data_"+ suffixe + 'rho='+ str(nb_rho)+ ".pth")
-# plt.hist(vec_corr)
-# plt.show()
+
 exec(open('visualization.py').read()) 

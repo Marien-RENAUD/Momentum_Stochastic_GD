@@ -2,27 +2,24 @@ import torch
 import numpy as np
 import numpy.random as nprandom
 
+###-- Functions used for data generation, optimization algorithms, and racoga computation for
+### the linear regression problem ---### 
+
 rng = np.random.default_rng()
 
 def features_gaussian(d, N, mean, generate_bias=False):
+    "-- Generate gaussian features --"
     if generate_bias:
         bias = torch.normal(torch.rand(N) * 2 * N - N, torch.tensor([N]))
-    else:
-        bias = None
-    
     random_matrix = torch.rand((d, d)) * 2 - 1
     cov_matrix = torch.matmul(random_matrix, random_matrix.t())
     features_matrix = torch.distributions.MultivariateNormal(mean, scale_tril= torch.tril(cov_matrix))
-    return features_matrix.sample((N,)), bias
-
+    if generate_bias:
+        return features_matrix.sample((N,)), bias
+    else:
+        return features_matrix.sample((N,))
 def sphere_uniform(d, N):
-    """
-    Generate points uniformly distributed on the sphere.
-    
-    :param d: Dimension of the sphere.
-    :param N: Number of points to generate.
-    :return: Tensor whose shape is (n_points, d) each line is a point on the sphere.
-    """
+    #-- Generate gaussian features --#
     points = torch.randn(N, d)
     
     points = points / points.norm(dim=1, keepdim=True)
@@ -38,7 +35,7 @@ def features_orthogonal(d,N,generate_lambda = False, generate_bias = False):
     if generate_bias :
         bias = torch.normal(torch.rand(N) * 2 * N - N, torch.tensor([N]))
         return features_matrix,bias
-    return features_matrix, None
+    return features_matrix
 
 def features_gaussian_mixture(d,N,mean,mixture_prob): # features of law gaussian mixture
     nb_class = len(mixture_prob)
@@ -85,23 +82,15 @@ def grad_f(x,N,features_matrix,bias,return_racoga = False):
     gradient = torch.sum(grad,axis=0)/N
     if return_racoga == True:
         corr = torch.matmul(grad,grad.T)
-
         racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
         return gradient,racoga
     return gradient
 
 def grad_sto_f(x, d, N, n_sample, batch_size, features_matrix, bias):
-    # Création du vecteur 'vec'
     vec = np.tile(np.arange(N),n_sample).reshape(n_sample,N)
-
-    # Calcul de 'grad'
     grad = torch.moveaxis((torch.matmul(features_matrix, x) - bias.reshape(N, 1)), 0, 1).view(n_sample, N, 1) * features_matrix
-    # Sélection aléatoire des index de batch
-
     batch_index = torch.tensor(rng.permuted(vec,axis=1)[:,:batch_size])
-    # Calcul du gradient final
     gradient = torch.take_along_dim(grad, batch_index.view(n_sample, batch_size, 1), dim=1).mean(dim=1).T
-    
     return gradient 
 
 def grad_sto_f_batch_rep(x,d,N,n_sample,batch_size,features_matrix,bias,nb_class):
@@ -123,9 +112,7 @@ def racoga_computation(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
     corr = torch.matmul(grad,grad.T)
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
-    # return N/(1+2*racoga)
     return racoga
-    
     
 def racoga_computation_alternative_sampling(x,N,features_matrix,bias):
     grad =(torch.matmul(features_matrix,x)-bias).reshape(N,1)*features_matrix
@@ -133,15 +120,13 @@ def racoga_computation_alternative_sampling(x,N,features_matrix,bias):
     racoga = torch.sum(torch.triu(corr,diagonal=1))/torch.sum(torch.diag(corr))
     return N/(1+2*racoga)    
 
-
-def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
+def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False,return_traj = False):
     f_GD = torch.empty(n_iter)
     x_GD = torch.empty((n_iter,d))
     if return_racoga == True:
         racoga = np.empty(n_iter-1)
     x_GD[0,:] = x_0
     f_GD[0] = f(x_0,features_matrix,bias)
-
     step = 1/L
     for i in range(n_iter-1):
         if return_racoga == True:
@@ -152,26 +137,23 @@ def GD(x_0,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
         f_GD[i+1] = f(x_GD[i+1,:],features_matrix,bias)
     if return_racoga == True:
         return f_GD,racoga
+    elif return_traj == True:
+        return f_GD,x_GD
     else:
         return f_GD
             
-def SGD(x_0, L_sgd, n_iter, n_sample, d, batch_size, N, features_matrix, bias, random_init=False, return_racoga=False, alternative_sampling=False, nb_class=None):
+def SGD(x_0, L_sgd, n_iter, n_sample, d, batch_size, N, features_matrix, bias, random_init=False, return_racoga=False, alternative_sampling=False, nb_class=None,return_traj = False):
     x_SGD = torch.empty((n_iter, d, n_sample))
     f_SGD = torch.empty((n_iter, n_sample))
-
     if return_racoga:
         racoga = torch.empty(n_iter - 1)
-
-
     if random_init:
         x_SGD[0, :, :] = torch.normal(0, 1, size=(d, n_sample))  # Using standard normal distribution for initialization
         f_sample(x_0_torch, N, features_matrix, bias)
     else:
         x_SGD[0, :, :] = x_0.reshape(d,1)
         f_SGD[0, :] = f(x_0, features_matrix, bias)
-
     step = 1 / L_sgd
-
     for i in range(n_iter - 1):
         if not alternative_sampling:
             gradient_sto = grad_sto_f(x_SGD[i, :, :], d, N, n_sample, batch_size, features_matrix, bias)
@@ -179,30 +161,27 @@ def SGD(x_0, L_sgd, n_iter, n_sample, d, batch_size, N, features_matrix, bias, r
             gradient_sto = grad_sto_f_batch_rep(x_SGD[i, :, :], d, N, n_sample, batch_size, features_matrix, bias, nb_class)
         if return_racoga:
             racoga[i] = racoga_computation(x_SGD[i, :, 0], N, features_matrix, bias)
-        # grad =(torch.matmul(features_matrix,x_SGD[i, :, :])-bias)[:,0].reshape(N,1)*features_matrix
-        # gradient_sto = grad[int(i%N),:].reshape(N,1)
         x_SGD[i + 1, :, :] = x_SGD[i, :, :] - step * gradient_sto
         f_SGD[i + 1, :] = f_sample(x_SGD[i + 1, :, :], N, features_matrix, bias)
-
     if return_racoga:
         return f_SGD, racoga
+    elif return_traj == True:
+        return f_SGD,x_SGD
     else:
         return f_SGD  
-def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
+
+def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False,return_traj = False):
     x_nag = torch.empty((n_iter,d))
     y_nag = torch.empty((n_iter,d))
     f_nag = torch.empty(n_iter)
-
     x_nag[0,:] = x_0
     y_nag[0,:] = x_0
     f_nag[0] = f(x_0,features_matrix,bias)
-
     if return_racoga == True:
         racoga = torch.empty(n_iter-1)
     ## Params
     alpha = (1-np.sqrt(mu/L))/(1+np.sqrt(mu/L))
     step = 1/(L)
-
     for i in range(1,n_iter):
         if return_racoga == True:
             gradient,racoga[i-1] = grad_f(y_nag[i-1],N,features_matrix,bias,return_racoga)
@@ -211,38 +190,33 @@ def NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_racoga = False):
         x_nag[i,:] = y_nag[i-1,:] - step*gradient
         y_nag[i,:] = x_nag[i,:] + alpha*(x_nag[i,:] - x_nag[i-1,:])
         f_nag[i] = f(x_nag[i,:],features_matrix,bias)
-
     if return_racoga == True:
         return f_nag,racoga
+    elif return_traj == True:
+        return f_nag,x_nag
     else:
         return f_nag         
 
-def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None,L_max = None):
-
+def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random_init = False,return_racoga = False,alternative_sampling = False,nb_class = None,L_max = None,return_traj = False):
     x_snag = torch.empty((n_iter,d,n_sample))
     y_snag = torch.empty((n_iter,d,n_sample))
     z_snag =  torch.empty((n_iter,d,n_sample))
     f_snag =  torch.empty((n_iter,n_sample))
-
     if return_racoga == True:
         racoga = torch.empty(n_iter-1)
-
     if random_init == False:
         x_snag[0,:,:] = x_0.reshape(d,1)
         y_snag[0,:,:] = x_0.reshape(d,1)
         z_snag[0,:,:] = x_0.reshape(d,1)
         f_snag[0,:] =  f(x_0,features_matrix,bias)
-
     else:
         x_0 = nprandom.normal(0, d,(d,n_sample))
         x_snag[0,:,:] =  x_0
         y_snag[0,:,:] = x_0
         z_snag[0,:,:] =  x_0
         f_snag[0,:] =  f_sample(x_0,N,features_matrix,bias)
-
     # Params
     step = 1/(L*rho)
-    # step = 1/L_max
     eta = 1/(np.sqrt(mu*L)*rho)
     beta = 1-np.sqrt( (mu/L) )/rho
     alpha = 1/(1+(1/rho)*np.sqrt(mu/L))
@@ -253,15 +227,13 @@ def SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,random
             gradient_sto = grad_sto_f_batch_rep(y_snag[i-1,:,:],d,N,n_sample,batch_size,features_matrix,bias,nb_class)
         if return_racoga == True:
             racoga[i-1] = racoga_computation(y_snag[i-1,:,0],N,features_matrix,bias)
-        # grad =(torch.matmul(features_matrix,y_snag[i-1,:,:])-bias)[:,0].reshape(N,1)*features_matrix
-        # gradient_sto = grad[int((i+1)%N),:].reshape(N,1)
         x_snag[i,:,:] = y_snag[i-1,:,:] - step*gradient_sto
         z_snag[i,:,:] = beta*z_snag[i-1,:,:] + (1-beta)*y_snag[i-1,:,:] - eta*gradient_sto
         y_snag[i,:,:] = z_snag[i,:,:]*(1-alpha) + (alpha)*x_snag[i,:,:]
-
         f_snag[i,:] =f_sample(x_snag[i,:],N,features_matrix,bias)
-
     if return_racoga == True:
         return f_snag,racoga
+    elif return_traj == True:
+        return f_snag,x_snag
     else:
         return f_snag          
