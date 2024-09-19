@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-import pandas as pd
+# import pandas as pd
 
 include_adam = True ## Set True to also plot ADAM 
 include_RMSprop = True ## Set True to also plot RMSprop
@@ -10,9 +10,9 @@ setting = "_n_epoch_5_batch_random_with_rpl_alg_"
 list_net = ['CNN', 'MLP']
 i = 1  ## choice of network type : 0 for CNN, 1 for MLP
 if i == 0:
-    list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.05_momentum_0.9_seed_','_lr_2.0_momentum_0.7_seed_','_lr_4.0_momentum_0.0_seed_','_lr_0.005_momentum_0.6_beta_0.8_seed_']
+    list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.05_momentum_0.9_seed_','_lr_2.0_momentum_0.7_seed_','_lr_4.0_momentum_0.0_seed_','_lr_0.005_momentum_0.6_beta_0.8_seed_','_lr_0.005_alpha_0.9_seed_']
 if i == 1:
-    list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.1_momentum_0.9_seed_','_lr_2.0_momentum_0.9_seed_','_lr_3.0_momentum_0.0_seed_','_lr_0.001_momentum_0.7_beta_0.8_seed_']
+    list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.1_momentum_0.9_seed_','_lr_2.0_momentum_0.9_seed_','_lr_3.0_momentum_0.0_seed_','_lr_0.001_momentum_0.7_beta_0.8_seed_','_lr_0.001_alpha_0.8_seed_']
 list_seed=['33','34','35','36','37','38', '39', '40','41','42']
 nb_seed = len(list_seed)
 size_vec = len(torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_dict_loss.pth")["loss_trajectory"])
@@ -64,7 +64,7 @@ for j in range(len(list_seed)):
     dict_racoga_nag = np.load(root + list_net[i] + setting  + "NAG" + list_param[2] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
     dict_racoga_gd = np.load(root + list_net[i] + setting  + "GD" + list_param[3] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
     dict_racoga_adam = np.load(root + list_net[i] + setting  + "ADAM" + list_param[4] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
-    dict_racoga_rms = np.load(root + list_net[i] + setting  + "RMSprop" + list_param[4] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
+    dict_racoga_rms = np.load(root + list_net[i] + setting  + "RMSprop" + list_param[5] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
     racoga_trajectory_sgd += np.array(dict_racoga_sgd.item()["racoga_list"])
     racoga_trajectory_snag += np.array(dict_racoga_snag.item()["racoga_list"])
     racoga_trajectory_nag += np.array(dict_racoga_nag.item()["racoga_list"])
@@ -93,7 +93,7 @@ racoga_trajectory_rms /= nb_seed
 
 plt.figure(figsize=(10,5))
 label_size = 20
-legend_size = 15
+legend_size = 10
 number_size = 15
 labelpad_y = -20
 labelpad_x = 2
@@ -113,11 +113,18 @@ if include_RMSprop == True:
 plt.xticks((0,782*5 +1), fontsize = number_size)
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad_x)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad_y)
-plt.yticks((0,2.3),["0","2.3"], fontsize = number_size)
-# plt.ylim((0,0.75))
+# plt.yticks((0,2.4),["0","2.4"], fontsize = number_size)
+# plt.ylim((0,2.4))
+plt.yticks((0,0.75),["0","0.75"], fontsize = number_size)
+plt.ylim((0,0.75))
+plt.xlim((-500,3911))
 
-
-plt.legend(fontsize = legend_size,frameon=False, bbox_to_anchor=(0.41, 0.35))
+plt.legend(fontsize = legend_size,frameon=False)#, bbox_to_anchor=(0.45, 0.45))
+label_size = 20
+legend_size = 15
+number_size = 15
+labelpad_y = -20
+labelpad_x = 2
 plt.subplot(122)
 
 nb_gd_eval_det = torch.arange(0,782*5+1  ,782)*0.01
