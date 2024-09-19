@@ -20,11 +20,12 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM","RMSprop"])
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--beta_adam',type=float, default = 0.999)
+parser.add_argument('--alpha_rms',type=float, default = 0.99)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--grid_search', type=bool, default = False, choices = [True, False])
 hparams = parser.parse_args()
@@ -56,6 +57,7 @@ momentum = hparams.momentum
 alg = hparams.alg
 lr = hparams.lr
 beta = hparams.beta_adam
+alpha = hparams.alpha_rms
 # if alg == "SGD" or alg == "SNAG":
 #     lr = 0.1
 # if alg == "GD":
@@ -72,6 +74,8 @@ if alg == "SNAG" or alg == "NAG":
     optimizer = torch.optim.SGD(net.parameters(), lr = lr, momentum=momentum, nesterov = "True")
 if alg == "ADAM":
     optimizer = torch.optim.Adam(net.parameters(), lr = lr, betas = (momentum,beta))
+if alg == "RMSprop":
+    optimizer = torch.optim.RMSprop(net.parameters(), lr= lr, alpha = alpha)
 batch_size_train = 64
 if alg == "GD" or alg == "NAG":
     batch_size_train = 50000
@@ -218,6 +222,11 @@ if grid_search == True:
         path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
+    elif alg == "RMSprop":
+        name_dir = 'lr_' + str(lr) + '_alpha_' + str(alpha)
+        path_results = os.path.join(path_results, name_dir) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
     else:
         name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum) + '_beta_' + str(beta)
         path_results = os.path.join(path_results, name_dir) 
@@ -234,6 +243,11 @@ else:
         os.mkdir(path_results)
     if alg == "SGD" or alg == "GD":
         path_results = os.path.join(path_results, 'lr_' +  str(lr)) 
+        if not os.path.exists(path_results):
+            os.mkdir(path_results)
+    elif alg == "RMSprop":
+        name_dir = 'lr_' + str(lr) + '_alpha_' + str(alpha)
+        path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
     else:
@@ -261,9 +275,13 @@ dict_results = {
 dict_loss = {"loss_trajectory" : loss_trajectory}
 if alg == "ADAM":
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+elif alg == "RMSprop":
+    suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
+
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
+
 # if grid_search == False:
 #     torch.save(dict_results, save_name+'_dict_results.pth')
 #     torch.save(dict_loss, save_name+'_dict_loss.pth')
@@ -280,6 +298,8 @@ if grid_search == False:
     dict_loss = {"loss_trajectory" : loss_trajectory}
     if alg == "ADAM":
         suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+    elif alg == "RMSprop":
+        suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
     else:
         suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
     save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
@@ -297,6 +317,8 @@ else:
     log_print += '\ntraining : '
 if alg == "ADAM":
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', beta = ' + str(beta) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+elif alg == "RMSprop":
+    log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', alpha = ' + str(alpha) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
 else:
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
 fichier = open("log_file.txt", "a")
