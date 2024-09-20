@@ -3,10 +3,21 @@ import numpy.random as nprandom
 import matplotlib.pyplot as plt
 import torch 
 from linear_regression import *
+from argparse import ArgumentParser
 
-version_bis = False # Set true to not overwrite the first data experiment
-load_features = False
-alternative_sampling = False
+parser = ArgumentParser()
+parser.add_argument('--features_type', type=str, default = "gaussian_mixture", choices=["gaussian_mixture", "gaussian", "sphere_uniform" ,"orthogonal"])
+parser.add_argument('--rho', type=bool, default = str, choices=["low_racoga","high_racoga"])
+parser.add_argument('--version_bis', type=bool, default = False, choices=[False, True]) ## To write bis version of figures
+parser.add_argument('--load_features', type=bool, default = False, choices=[False, True]) ## To load existing features
+parser.add_argument('--alternative_sampling', type=bool, default = False, choices=[False, True]) ## Alternative sampling, see utils.py
+
+hparams = parser.parse_args()
+choice_rho=hparams.rho
+features_type =hparams.features_type
+version_bis = hparams.version_bis
+load_features = hparams.load_features
+alternative_sampling = hparams.alternative_sampling
 
 features_type = 0 # Set 0 for gaussian features, 1 for uniform on the sphere features, 2 for gaussian-
 #-mixture features and 3 for orthogonal features
@@ -22,15 +33,15 @@ if load_features:
     features = np.load("features.npy")
     features_matrix, bias = features["features_matrix"], features["bias"]
 else:
-    if features_type == 0:
+    if features_type == "gaussian":
         mean = torch.zeros(d)
         features_matrix,bias = features_gaussian(d,N,mean,generate_bias=True)
         nb_class = None
-    elif features_type == 1:
+    elif features_type == "sphere_uniform":
         mean = torch.zeros(d)
         features_matrix,bias = sphere_uniform(d, N)
         nb_class = None
-    elif features_type == 2:
+    elif features_type == "gaussian_mixture":
         nb_class = 10
         mean = torch.rand(nb_class,d) * 2 * d - d 
         if alternative_sampling == True:
@@ -62,8 +73,10 @@ if d > N:
 else:
     mu = torch.min(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
-
-rho = torch.tensor([0.25,0.5,1])*N/batch_size ## Overparameterized exemple value
+if rho == "low_racoga":
+    rho = torch.tensor([0.5,1,1.5])*N/batch_size 
+else:
+    rho = torch.tensor([0.25,0.5,1])*N/batch_size     
 
 vec_norm= (features_matrix**2).sum(axis=1)
 print(torch.sort(vec_norm))

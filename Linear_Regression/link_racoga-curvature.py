@@ -7,6 +7,9 @@ from linear_regression import *
 from matplotlib.lines import Line2D
 
 def racoga_values(d,N,n_ech,features_matrix,bias):
+    """
+    Compute RACOGA values on the sphere
+    """
     vec_ech = torch.empty(n_ech)
     vec_x = torch.empty((n_ech,d))
     for i in range(n_ech):
@@ -17,6 +20,9 @@ def racoga_values(d,N,n_ech,features_matrix,bias):
     return vec_x,vec_ech
 
 def curvature_values(d,N,n_ech,features_matrix):
+    """
+    Compute curvature values along a grid
+    """
     curvature = torch.empty(n_ech)
     vec_x = torch.empty((n_ech,d))
     Hessian = torch.matmul(features_matrix.t(),features_matrix)

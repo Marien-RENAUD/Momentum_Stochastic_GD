@@ -67,14 +67,11 @@ else:
     mu = torch.min(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
 
-print("Conditionnement : ", mu/L)
-
 vec_norm= (features_matrix**2).sum(axis=1)
 arg_L_max = torch.argmax(vec_norm) 
 L_max = torch.max(vec_norm)
 L_sgd = N*(batch_size-1)/(batch_size*(N-1))*L + (N-batch_size)/(batch_size*(N-1))*L_max # cf. Garrigos and Gower (2024)
 labels = ["GD", "SGD", "NAG"]
-print("N = ",N, "cond max = ", L_max/mu)
 print("NAG")
 f_nag,racoga_nag = NAG(x_0,mu,L,int(n_iter*batch_size[0]/N)+1,d,N,features_matrix,bias,return_racoga = True)
 print("GD")
