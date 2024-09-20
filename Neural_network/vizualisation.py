@@ -1,26 +1,30 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-# import pandas as pd
 
-include_adam = True ## Set True to also plot ADAM 
-include_RMSprop = True ## Set True to also plot RMSprop
+include_adam = False ## Set True to also plot ADAM 
+include_RMSprop = False ## Set True to also plot RMSprop
+batch_norm = True ## Set true if batch norm
 root = 'results/'
 setting = "_n_epoch_5_batch_random_with_rpl_alg_"
 list_net = ['CNN', 'MLP']
-i = 1  ## choice of network type : 0 for CNN, 1 for MLP
+i = 0  ## choice of network type : 0 for CNN, 1 for MLP
 if i == 0:
     list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.05_momentum_0.9_seed_','_lr_2.0_momentum_0.7_seed_','_lr_4.0_momentum_0.0_seed_','_lr_0.005_momentum_0.6_beta_0.8_seed_','_lr_0.005_alpha_0.9_seed_']
 if i == 1:
     list_param = ['_lr_0.3_momentum_0.0_seed_','_lr_0.1_momentum_0.9_seed_','_lr_2.0_momentum_0.9_seed_','_lr_3.0_momentum_0.0_seed_','_lr_0.001_momentum_0.7_beta_0.8_seed_','_lr_0.001_alpha_0.8_seed_']
-list_seed=['33','34','35','36','37','38', '39', '40','41','42']
+if batch_norm:
+    list_param = ['_lr_1.0_momentum_0.0_seed_','_lr_0.2_momentum_0.9_seed_','_lr_2.0_momentum_0.7_seed_','_lr_4.0_momentum_0.0_seed_','_lr_0.005_momentum_0.6_beta_0.8_seed_','_lr_0.005_alpha_0.9_seed_']
+ 
+# list_seed=['33','34','35','36','37','38', '39', '40','41','42']
+list_seed=['37','38', '39', '40','41','42']
 nb_seed = len(list_seed)
-size_vec = len(torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_dict_loss.pth")["loss_trajectory"])
+size_vec = len(torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_BN_dict_loss.pth")["loss_trajectory"])
 size_vec_det = len(torch.load(root + list_net[i] + setting  + "GD" + list_param[3] + list_seed[0] + "_dict_loss.pth")["loss_trajectory"])
 
 
 
-## Import loss along algorithms iterations
+#-- Import loss along algorithms iterations --#
 loss_trajectory_sgd = torch.zeros(size_vec)
 loss_trajectory_snag = torch.zeros(size_vec)
 loss_trajectory_nag = torch.zeros(size_vec_det)
@@ -28,8 +32,8 @@ loss_trajectory_gd = torch.zeros(size_vec_det)
 loss_trajectory_adam = torch.zeros(size_vec)
 loss_trajectory_rms = torch.zeros(size_vec)
 for j in range(len(list_seed)):
-    dict_results_sgd = torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[j] + "_dict_loss.pth")
-    dict_results_snag = torch.load(root + list_net[i] + setting  + "SNAG" + list_param[1] + list_seed[j] + "_dict_loss.pth")
+    dict_results_sgd = torch.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[j] + "_BN_dict_loss.pth")
+    dict_results_snag = torch.load(root + list_net[i] + setting  + "SNAG" + list_param[1] + list_seed[j] + "_BN_dict_loss.pth")
     dict_results_nag = torch.load(root + list_net[i] + setting  + "NAG" + list_param[2] +list_seed[j] +"_dict_loss.pth")
     dict_results_gd = torch.load(root + list_net[i] + setting  + "GD" + list_param[3] +list_seed[j] +"_dict_loss.pth")
     dict_results_adam = torch.load(root + list_net[i] + setting  + "ADAM" + list_param[4] +list_seed[j] +"_dict_loss.pth")
@@ -49,8 +53,8 @@ loss_trajectory_rms /= nb_seed
 
 
 
-## Import RACOGA values
-size_vec = len(np.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_racoga_results.npy", allow_pickle=True).item()["racoga_list"])
+#-- Import RACOGA values --#
+size_vec = len(np.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[0] + "_BN_racoga_results.npy", allow_pickle=True).item()["racoga_list"])
 size_vec_det = len(np.load(root + list_net[i] + setting  + "GD" + list_param[3] + list_seed[0] + "_racoga_results.npy", allow_pickle=True).item()["racoga_list"])
 racoga_trajectory_sgd = np.zeros(size_vec)
 racoga_trajectory_snag = np.zeros(size_vec)
@@ -59,8 +63,8 @@ racoga_trajectory_nag = np.zeros(size_vec_det)
 racoga_trajectory_adam = np.zeros(size_vec)
 racoga_trajectory_rms = np.zeros(size_vec)
 for j in range(len(list_seed)):
-    dict_racoga_sgd = np.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[j] + "_racoga_results.npy", allow_pickle=True)
-    dict_racoga_snag = np.load(root + list_net[i] + setting  + "SNAG" + list_param[1] + list_seed[j] + "_racoga_results.npy", allow_pickle=True)
+    dict_racoga_sgd = np.load(root + list_net[i] + setting  + "SGD" + list_param[0] + list_seed[j] + "_BN_racoga_results.npy", allow_pickle=True)
+    dict_racoga_snag = np.load(root + list_net[i] + setting  + "SNAG" + list_param[1] + list_seed[j] + "_BN_racoga_results.npy", allow_pickle=True)
     dict_racoga_nag = np.load(root + list_net[i] + setting  + "NAG" + list_param[2] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
     dict_racoga_gd = np.load(root + list_net[i] + setting  + "GD" + list_param[3] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
     dict_racoga_adam = np.load(root + list_net[i] + setting  + "ADAM" + list_param[4] +list_seed[j] +"_racoga_results.npy", allow_pickle=True)
@@ -80,17 +84,7 @@ racoga_trajectory_adam /= nb_seed
 racoga_trajectory_rms /= nb_seed
 
 
-# setting = "_n_epoch_10_batch_random_with_rpl_alg_"
-# dict_racoga_sgd = np.load(root + list_net[i] + setting  + "SGD_racoga_results.npy", allow_pickle=True)
-# dict_racoga_snag = np.load(root + list_net[i] + setting  + "SNAG_racoga_results.npy", allow_pickle=True)
-# dict_racoga_nag = np.load(root + list_net[i] + setting  + "NAG_racoga_results.npy", allow_pickle=True)
-# dict_racoga_gd = np.load(root + list_net[i] + setting  + "GD_racoga_results.npy", allow_pickle=True)
-# print(type(dict_racoga_gd))
-# racoga_trajectory_sgd = dict_racoga_sgd.item()['racoga_list']
-# racoga_trajectory_snag = dict_racoga_snag.item()["racoga_list"]
-# racoga_trajectory_gd = dict_racoga_gd.item()["racoga_list"]
-# racoga_trajectory_nag = dict_racoga_nag.item()["racoga_list"]
-
+#-- Plots --#
 plt.figure(figsize=(10,5))
 label_size = 20
 legend_size = 10
@@ -115,10 +109,9 @@ plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad_x)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad_y)
 # plt.yticks((0,2.4),["0","2.4"], fontsize = number_size)
 # plt.ylim((0,2.4))
-plt.yticks((0,0.75),["0","0.75"], fontsize = number_size)
-plt.ylim((0,0.75))
-plt.xlim((-500,3911))
-
+plt.yticks((0,0.75,2.5),["0","0.75","2.5"], fontsize = number_size)
+plt.ylim((0,2.5))
+# plt.xlim((-500,3911))
 plt.legend(fontsize = legend_size,frameon=False)#, bbox_to_anchor=(0.45, 0.45))
 label_size = 20
 legend_size = 15
@@ -126,15 +119,7 @@ number_size = 15
 labelpad_y = -20
 labelpad_x = 2
 plt.subplot(122)
-
 nb_gd_eval_det = torch.arange(0,782*5+1  ,782)*0.01
-# plt.plot(racoga_trajectory_sgd[:40],label = "SGD",c = "black",lw=3)
-# plt.plot(racoga_trajectory_snag[:40],label = "SNAG",c = "blue",lw=3)
-# plt.plot(nb_gd_eval_det,racoga_trajectory_gd[:6],label = "GD",c = "purple",lw=3,linestyle="--")
-# plt.plot(nb_gd_eval_det,racoga_trajectory_nag[:6],label = "NAG",c = "red",lw=3)
-# plt.xticks((0,32))
-# plt.yticks((10,150))
-
 plt.hist(racoga_trajectory_sgd[:3911],bins="sqrt",edgecolor=None,facecolor = "black",density = True,alpha = 0.5,label = "SGD")
 plt.hist(racoga_trajectory_snag[:3911],bins="sqrt",edgecolor=None,facecolor = col,density = True,alpha = 0.5,label = "SNAG")
 plt.hist(racoga_trajectory_gd[:6],bins="sqrt",edgecolor=None,facecolor = "purple",density = True,alpha = 0.5,label = "GD")
@@ -148,12 +133,19 @@ plt.yticks((0,0.06), ["0","0.06"], fontsize = number_size)
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad_x)
 # plt.yticks((np.array(racoga_trajectory_snag,dtype = np.float32).min(),np.array(racoga_trajectory_snag,dtype = np.float32).max()))
 plt.legend(fontsize = legend_size,frameon=False)
-if include_adam == True & include_RMSprop == False:
+
+if include_adam == True and include_RMSprop == False:
+    print("b")
     plt.savefig("figures/alg_cv_" + list_net[i] + "_10_seeds_with_ADAM.png")
-elif include_RMSprop == True  & include_adam == False:
+elif include_RMSprop == True  and include_adam == False:
+    print("c")
     plt.savefig("figures/alg_cv_" + list_net[i] + "_10_seeds_with_RMSprop.png")
-elif include_RMSprop == True  & include_adam == True:
+elif include_RMSprop == True  and include_adam == True:
+    print("d")
     plt.savefig("figures/alg_cv_" + list_net[i] + "_10_seeds_with_RMSprop_and_ADAM.png")
+elif batch_norm:
+    print("a")
+    plt.savefig("figures/alg_cv_BN_" + list_net[i] + "_10_seeds.png")
 else:
     plt.savefig("figures/alg_cv_" + list_net[i] + "_10_seeds.png")
 

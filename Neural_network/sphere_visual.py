@@ -16,9 +16,8 @@ color = np.zeros((100,100),dtype=int)
 # Plot the surface
 
 color = np.where(z > 0, 300, 0)  # Assign 1 to positive z, 0 to negative z
-color_map = cm.coolwarm(color)  # Use a colormap based on this data
+color_map = cm.coolwarm(color) 
 ax.plot_surface(x, y, z, facecolors=color_map, rstride=1, cstride=1,alpha = 0.6)
-# Set an equal aspect ratio
 ax.set_aspect('equal')
 ax.set_xticklabels([])
 ax.set_xticks([])

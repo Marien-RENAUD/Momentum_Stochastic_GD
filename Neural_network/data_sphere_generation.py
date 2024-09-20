@@ -5,6 +5,9 @@ import os
 torch.manual_seed(42)
 
 def sphere_uniform(d, n_points):
+    """
+    Generate points uniformly onto the sphere
+    """
     points = torch.randn(n_points, d)
     points = points / points.norm(dim=1, keepdim=True)
     

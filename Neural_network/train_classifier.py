@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm.auto import tqdm
-from models_architecture import create_mlp, create_cnn
+from models_architecture import create_mlp, create_cnn, create_cnn_bn
 from argparse import ArgumentParser
 from utils import sort_batches
 from utils import calculate_training_loss
@@ -28,6 +28,7 @@ parser.add_argument('--beta_adam',type=float, default = 0.999)
 parser.add_argument('--alpha_rms',type=float, default = 0.99)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--grid_search', type=bool, default = False, choices = [True, False])
+parser.add_argument('--batch_normalization', type=bool, default = False, choices = [True, False])
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -40,6 +41,7 @@ def set_seed(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 current_seed = hparams.seed
+batch_normalization = hparams.batch_normalization
 set_seed(current_seed)
 grid_search = hparams.grid_search
 
@@ -48,8 +50,11 @@ network_type = hparams.network_type
 if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
-if network_type == "CNN":# Light CNN architecture
+if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
     net = create_cnn().to(device)
+
+if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
+    net = create_cnn_bn().to(device)
 criterion = nn.CrossEntropyLoss()
 
 momentum = hparams.momentum
@@ -262,6 +267,8 @@ elif alg == "RMSprop":
 
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+if batch_normalization:
+    suffix += "_BN_"
 save_name = path_results + '/' +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 
 plt.plot(loss_trajectory)
@@ -279,6 +286,8 @@ if grid_search == False:
         suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
     else:
         suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+    if batch_normalization:
+        suffix += "_BN"
     save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
     if grid_search == False:
         torch.save(dict_results, save_name+'_dict_results.pth')
@@ -297,6 +306,8 @@ elif alg == "RMSprop":
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', alpha = ' + str(alpha) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
 else:
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) + ', final training loss : ' + str(train_loss) + ', test accuracy : ' + str(test_accur) + '. Computation time : ' + str(duration)
+if batch_normalization:
+    log_print += ' . BN'
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)
 fichier.close()
