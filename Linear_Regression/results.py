@@ -7,20 +7,17 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument('--features_type', type=str, default = "gaussian_mixture", choices=["gaussian_mixture", "gaussian", "sphere_uniform" ,"orthogonal"])
-parser.add_argument('--rho', type=bool, default = str, choices=["low_racoga","high_racoga"])
+parser.add_argument('--rho', type=str, default = "low_racoga", choices=["low_racoga","high_racoga"])
 parser.add_argument('--version_bis', type=bool, default = False, choices=[False, True]) ## To write bis version of figures
 parser.add_argument('--load_features', type=bool, default = False, choices=[False, True]) ## To load existing features
 parser.add_argument('--alternative_sampling', type=bool, default = False, choices=[False, True]) ## Alternative sampling, see utils.py
 
 hparams = parser.parse_args()
-choice_rho=hparams.rho
+rho_choice=hparams.rho
 features_type =hparams.features_type
 version_bis = hparams.version_bis
 load_features = hparams.load_features
 alternative_sampling = hparams.alternative_sampling
-
-features_type = 0 # Set 0 for gaussian features, 1 for uniform on the sphere features, 2 for gaussian-
-#-mixture features and 3 for orthogonal features
 
 d,N = 1000,100#choice of dimension d, number of functions N
 
@@ -50,7 +47,8 @@ else:
             mixture_prob = np.ones(nb_class)/nb_class
             features_matrix,bias = features_gaussian_mixture(d,N,mean=mean,mixture_prob=mixture_prob)
     else:
-        features_matrix,bias = features_orthogonal(d,N,generate_lambda=True) 
+        features_matrix = features_orthogonal(d,N,generate_lambda=True) 
+        mean = torch.zeros(d)
         bias = torch.zeros(N)
 
 features = {"features_matrix" : features_matrix, "bias" : bias}
@@ -73,7 +71,7 @@ if d > N:
 else:
     mu = torch.min(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
     L = torch.max(torch.linalg.eigh(torch.matmul(features_matrix.T, features_matrix))[0]) / N
-if rho == "low_racoga":
+if rho_choice == "low_racoga":
     rho = torch.tensor([0.5,1,1.5])*N/batch_size 
 else:
     rho = torch.tensor([0.25,0.5,1])*N/batch_size     

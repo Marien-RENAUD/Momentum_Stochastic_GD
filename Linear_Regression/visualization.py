@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-import pandas as pd
+# import pandas as pd
 import os as os
 
 print(os.getcwd() )
@@ -10,7 +10,7 @@ version_bis = False # Set true to not overwrite the first experiment
 root = "simul_data/" # Data results folder
 nb_rho = np.load("nb_rho.npy")
 features_type = np.load("features_type.npy") # True : biased features
-features_type = 0
+# features_type = 0
 if features_type == 0 :
     path_figure_root= 'results/unbiased_features/'
     suffixe = 'unbiased_'
@@ -55,7 +55,7 @@ for j in range(nb_alg):
     racoga_current = racoga[index[j]]
     racoga_mean[j],racoga_median[j], racoga_decile_inf[j], racoga_quantile_01[j], racoga_min[j], racoga_max[j] = racoga_current.mean(), np.quantile(racoga_current,0.5,method = 'nearest'), np.quantile(racoga_current,0.1,method = 'nearest'), np.quantile(racoga_current,0.01,method = 'nearest'), racoga_current.min(), racoga_current.max()
 vec_racoga = np.vstack((racoga_mean, racoga_median, racoga_decile_inf, racoga_quantile_01, racoga_min, racoga_max))
-df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
+# df_racoga = pd.DataFrame(vec_racoga,columns=labels,index = ["mean", "median", "inf-decile","quantile 0.01", "min", "max"])
 label_size = 20
 legend_size = 15
 number_size = 15
@@ -64,7 +64,8 @@ labelpad_x = 2
 plt.xlabel("Gradient evaluations",fontsize = label_size, labelpad = labelpad_x)
 plt.ylabel(r"$\log(f)$",fontsize = label_size, labelpad = labelpad_y)
 plt.xticks((0,n_iter*batch_size), fontsize = number_size)
-plt.yticks((12,19), fontsize = number_size)
+# plt.yticks((12,19), fontsize = number_size)
+plt.yticks((-8,9))
 plt.legend(loc = "lower left",fontsize = legend_size,frameon = False, bbox_to_anchor=(-0.01,-0.03))
 plt.subplot(122)
 min_hist = np.nan
@@ -74,8 +75,9 @@ for j in range(nb_rho):
     plt.hist(racoga[index[3+j]],bins="sqrt",edgecolor=None,facecolor = col,label = labels[3+j],density = True,alpha = 0.5)
     min_hist,max_hist = np.nanmin([min_hist,racoga[index[3+j]].min()]), np.nanmax([max_hist,racoga[index[3+j]].max()])
 plt.xlabel("RACOGA",fontsize = label_size, labelpad = labelpad_x)
-plt.xticks((-0.5,0,2.5),["-0.5", "0", "2.5"], fontsize = number_size)
-plt.yticks((0,2), fontsize = number_size)
+# plt.xticks((-0.5,0,2.5),["-0.5", "0", "2.5"], fontsize = number_size)
+plt.xticks((-0.12,0,0.12),["-0.12", "0", "0.12"], fontsize = number_size)
+plt.yticks((0,20), fontsize = number_size)
 plt.legend(fontsize = legend_size,frameon = False)
 plt.savefig(path_figure_cv)
 
