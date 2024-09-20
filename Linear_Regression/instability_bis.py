@@ -10,13 +10,19 @@ import matplotlib as mpl
 d,N = 2,2
 lambda_max = 10.
 lamba_min = 3.
-features_matrix,bias = torch.tensor([[lambda_max,0],[0,lamba_min]]), torch.zeros(2)
-L = lambda_max**2/2
-mu = lamba_min**2/2
+epsilon = 5
+# features_matrix,bias = torch.tensor([[lambda_max,0],[0,lamba_min]]), torch.zeros(2)
+features_matrix,bias = torch.tensor([[lambda_max,epsilon],[0,lamba_min]]), torch.zeros(2)
+Hessian = torch.matmul(features_matrix.t(),features_matrix)
+# L = lambda_max**2/2
+# mu = lamba_min**2/2
+L = nplinalg.eig(Hessian)[0].max()/2
+mu = nplinalg.eig(Hessian)[0].min()/2
+
 
 #-- Computation of curvature around the solution --#
 
-Hessian = torch.matmul(features_matrix.t(),features_matrix)
+
 precision = 200
 grid_precision = torch.linspace(-1,1,precision)
 x_grid,y_grid = np.meshgrid(grid_precision,grid_precision)
@@ -31,17 +37,18 @@ for i in range(precision):
 
 shrink_factor = 0.8
 x_0 = torch.ones(2)*shrink_factor
+x_0 = torch.tensor([0.,1.])*shrink_factor
 rho = 2
-L_max = 2*L
+L_max = lambda_max**2 + epsilon**2
 n_sample = 1 #number of parellel occurences of stochastic algorithms
 batch_size = 1 #size of batch
-n_iter=7*10**0
+n_iter=2*10**1
 nb_class = None
 f_nag,x_nag = NAG(x_0,mu,L,n_iter,d,N,features_matrix,bias,return_traj=True)
 f_gd,x_gd = GD(x_0,L,n_iter,d,N,features_matrix,bias,return_traj=True)
 f_sgd,x_sgd = SGD(x_0,L_max,n_iter,n_sample,d,batch_size,N,features_matrix,bias,alternative_sampling=False,nb_class=nb_class,return_traj=True)
 f_snag,x_snag = SNAG(x_0,mu,L,rho,n_iter,n_sample,d,batch_size,N,features_matrix,bias,alternative_sampling=False,nb_class=nb_class,L_max=L_max,return_traj=True)
-
+print(f_snag[-1])
 #-- Figures --#
 
 number_size = 15
