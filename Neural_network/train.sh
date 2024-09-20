@@ -34,9 +34,18 @@
 
 # done
 
-for seed in 33 34 35 36 37 38 39 40 41 42
+# for seed in 33 34 35 36 37 38 39 40 41 42
+# for seed in 37 38 39 40 41 42
+# do
+#     python train_classifier.py --lr 0.2 --momentum 0.9 --alg "SNAG" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5 --batch_normalization True
+#     python racoga_computation.py --lr 0.2 --momentum 0.9 --alg "SNAG" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5 --batch_normalization True
+
+# done
+
+# for seed in 33 34 35 36 37 38 39 40 41 42
+for seed in 37 38 39 40 41 42
 do
-    python train_classifier.py --lr 0.001 --alpha_rms 0.8 --alg "RMSprop" --device 1 --seed $seed --network_type "MLP" --data "SPHERE" --n_epoch 5
-    python train_classifier.py --lr 0.005 --alpha_rms 0.9 --alg "RMSprop" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5
+    python train_classifier.py --lr 1 --momentum 0 --alg "SGD" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5 --batch_normalization True
+    python racoga_computation.py --lr 1 --momentum 0 --alg "SGD" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5 --batch_normalization True
 
 done

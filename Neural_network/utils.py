@@ -36,6 +36,9 @@ def sort_batches(train_loader, batch_size, device):
     return batch_shuffle, targets_shuffle
 
 def calculate_training_loss(model, train_loader, criterion, device,network_type,batch_size_train):
+    """
+    Return the total loss value
+    """
     model.eval()  # Model in evaluate mode
     total_loss = 0.0
     total_samples = 0
@@ -45,7 +48,6 @@ def calculate_training_loss(model, train_loader, criterion, device,network_type,
             inputs, targets = inputs.to(device), targets.to(device)
             if network_type == "CNN":
                 inputs = inputs.view((batch_size_train, 3, 32, 32))
-            # Forward pass
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             

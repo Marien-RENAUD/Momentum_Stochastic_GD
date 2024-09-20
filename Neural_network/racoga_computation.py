@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm import tqdm
-from models_architecture import create_mlp, create_cnn
+from models_architecture import create_mlp, create_cnn, create_cnn_bn
 from argparse import ArgumentParser
 import time as time
 
@@ -25,12 +25,15 @@ parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--alpha_rms',type=float, default = 0.99)
 parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
 parser.add_argument('--beta_adam',type=float, default = 0.999)
+parser.add_argument('--batch_normalization', type=bool, default = False, choices = [True, False])
+
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
 
 batch_sample = hparams.batch_sample
 network_type = hparams.network_type
+batch_normalization = hparams.batch_normalization
 n_epoch = hparams.n_epoch
 alg = hparams.alg
 momentum = hparams.momentum
@@ -44,8 +47,11 @@ alpha = hparams.alpha_rms
 if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
-if network_type == "CNN":# Light CNN architecture
+if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
     net = create_cnn().to(device)
+
+if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
+    net = create_cnn_bn().to(device)
 
 criterion = nn.CrossEntropyLoss()
 if alg == "ADAM":
@@ -78,7 +84,8 @@ elif alg == "RMSprop":
     suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-
+if batch_normalization:
+    suffix += "_BN"
 dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  +suffix +'_dict_results.pth'
 dict_results = torch.load(dict_path)
 weights_trajectory = dict_results["weights_trajectory"]
@@ -178,7 +185,8 @@ elif alg == "RMSprop":
     suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
 else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-
+if batch_normalization:
+    suffix += "_BN"
 save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
 np.save(save_name+'_racoga_results.npy', dict)
 
@@ -196,6 +204,8 @@ elif alg == "RMSprop":
 else:
     log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
 log_print += 'datset = ' + data_choice + ', n_epoch = ' + str(n_epoch) +   ', alg = ' + alg + ', lr = ' + str(lr) + ', momentum = ' + str(momentum) +  '. Computation time : ' + str(duration)
+if batch_normalization:
+    log_print += ' . BN'
 fichier = open("log_file.txt", "a")
 fichier.write(log_print)
 fichier.close()
