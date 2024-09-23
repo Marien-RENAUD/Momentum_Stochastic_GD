@@ -209,7 +209,7 @@ else:
 duration = time.time() - start
 #Save the RACOGA evolution
 dict = {
-    "convexity_diff_list" : convexity_diff_list/60000,
+    "convexity_diff_list" : convexity_diff_list/50000,
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
     "computation_time" : duration

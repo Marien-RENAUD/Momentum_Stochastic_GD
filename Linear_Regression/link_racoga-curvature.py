@@ -43,12 +43,13 @@ n_ech = 10**4
 #-- Figures --#
 
 plt.figure(figsize=(10, 5))
+width = 2000
 number_size = 15
 label_size = 20
 legend_size = 15
 val_lim = 0.925
 for i in range(2):
-    vector_shrink = 0.85
+    vector_shrink = 0.7
     if i ==0:
         features_matrix = torch.eye(2)*vector_shrink
         plt.subplot(121)
@@ -62,7 +63,7 @@ for i in range(2):
     vec_x,vec_ech =  racoga_values(d,N,n_ech,features_matrix,bias)
     color_map = "CMRmap"
     color_vec = "firebrick"
-    scatter2 = plt.scatter(vec_x[:, 0], vec_x[:, 1], c=vec_ech, cmap=color_map,marker=".",s=200)
+    scatter2 = plt.scatter(vec_x[:, 0], vec_x[:, 1], c=vec_ech, cmap=color_map,marker=".",s=width)
     cbar2 = plt.colorbar(scatter2, orientation='vertical')
     cbar2.ax.tick_params(labelsize=number_size) 
     cbar2.set_ticks([torch.min(vec_ech),0, torch.max(vec_ech)]) 
@@ -116,8 +117,8 @@ for i in range(2):
     vec_x_curvature *= val_lim
     color_map = "CMRmap"
     color_vec = "firebrick"
-    scatter1 = plt.scatter(vec_x_curvature[:, 0], vec_x_curvature[:, 1], c=vec_ech_curvature, cmap="viridis",marker=".",s=200)
-    scatter2 = plt.scatter(vec_x[:, 0], vec_x[:, 1], c=vec_ech, cmap=color_map,marker=".",s=200)
+    scatter1 = plt.scatter(vec_x_curvature[:, 0], vec_x_curvature[:, 1], c=vec_ech_curvature, cmap="viridis",marker=".",s=width)
+    scatter2 = plt.scatter(vec_x[:, 0], vec_x[:, 1], c=vec_ech, cmap=color_map,marker=".",s=width)
     cbar1 = plt.colorbar(scatter1, orientation='vertical')
     cbar2 = plt.colorbar(scatter2, orientation='vertical')
     cbar1.ax.tick_params(labelsize=number_size) 
