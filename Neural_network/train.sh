@@ -49,3 +49,4 @@ do
     python racoga_computation.py --lr 1 --momentum 0 --alg "SGD" --device 1 --seed $seed --network_type "CNN" --data "CIFAR10" --n_epoch 5 --batch_normalization True
 
 done
+python convexity_measure.py --lr 4 --alg "GD" --device 1 --momentum 0 --network_type "CNN" --data "CIFAR10" --n_epoch 5

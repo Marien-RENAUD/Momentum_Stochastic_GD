@@ -80,12 +80,13 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
 batch_size = 128
 step = hparams.step # interval between each RACOGA computation
-convexity_diff_list = []
+
 scalar_prod_list = []
 iteration_list = []
 
 if alg == "SGD" or alg == "SNAG":
-    for k in tqdm(range((len(weights_trajectory)//step)-1)):
+    convexity_diff_arr = torch.empty(len(weights_trajectory)//step)
+    for k in tqdm(range(len(weights_trajectory)//step)):
         iteration_list.append(step*k)
         x = weights_trajectory[step*k]
         for j, param in enumerate(net.parameters()):
@@ -109,10 +110,10 @@ if alg == "SGD" or alg == "SNAG":
             for param in net.parameters():
                 gradient_i = torch.cat((gradient_i,param.grad.flatten()))
             if sum_gradient.size() != torch.Size([0]):
-                sum_gradient += gradient_i
+                sum_gradient += gradient_i* batch_size
                 sum_loss_x += loss.item() * batch_size
             else:
-                sum_gradient = gradient_i
+                sum_gradient = gradient_i* batch_size
                 sum_loss_x = loss.item() * batch_size
 
 
@@ -141,13 +142,14 @@ if alg == "SGD" or alg == "SNAG":
                     sum_loss_x_next = loss.item() * batch_size
             scalar_product = (sum_gradient[0]*(x[0] - x_next[0])).sum()
             for j in range(len(x)):
-                scalar_product += (sum_gradient[j]*(x[j] - x_next[j])).sum()
-            convexity_diff = scalar_product + sum_loss_x - sum_loss_x_next
-            convexity_diff_list.append(convexity_diff.detach().cpu().numpy())
+                scalar_product += (sum_gradient[j]*(x_next[j] - x[j])).sum()
+            convexity_diff = sum_loss_x_next - (scalar_product + sum_loss_x)
+            convexity_diff_arr[k] = convexity_diff#(convexity_diff.detach().cpu().numpy())
 else:
+    convexity_diff_arr = torch.empty(len(weights_trajectory))
     for k in tqdm(range(len(weights_trajectory))):
-        iteration_list.append(step*k)
-        x = weights_trajectory[step*k]
+        iteration_list.append(k)
+        x = weights_trajectory[k]
         for j, param in enumerate(net.parameters()):
             param.data = x[j].to(device)
         sum_gradient = torch.tensor([]).to(device)
@@ -170,15 +172,14 @@ else:
             for param in net.parameters():
                 gradient_i = torch.cat((gradient_i,param.grad.flatten()))
             if sum_gradient.size() != torch.Size([0]):
-                sum_gradient += gradient_i
+                sum_gradient += gradient_i* batch_size
                 sum_loss_x += loss.item() * batch_size
             else:
-                sum_gradient = gradient_i
+                sum_gradient = gradient_i* batch_size
                 sum_loss_x = loss.item() * batch_size
 
 
-        iteration_list.append(step*k)
-        x_next = weights_trajectory[step*(k+1)]
+        x_next = weights_trajectory[k]
         for j, param in enumerate(net.parameters()):
             param.data = x_next[j].to(device)
         sum_loss_x_next = 0
@@ -200,16 +201,16 @@ else:
                     sum_loss_x_next += loss.item() * batch_size
                 else:
                     sum_loss_x_next = loss.item() * batch_size
-            scalar_product = (sum_gradient[0]*(x[0] - x_next[0])).sum()
-            for j in range(len(x)):
-                scalar_product += (sum_gradient[j]*(x[j] - x_next[j])).sum()
-            convexity_diff = scalar_product + sum_loss_x - sum_loss_x_next
-            convexity_diff_list.append(convexity_diff.detach().cpu().numpy())
-
+            scalar_product = (sum_gradient[0]*(x_next[0]-x[0])).sum()
+            for j in range(1,len(x)):
+                scalar_product += (sum_gradient[j]*(x_next[j]-x[j])).sum()
+        convexity_diff =  sum_loss_x_next - (scalar_product + sum_loss_x)
+        convexity_diff_arr[k] = convexity_diff#(convexity_diff.detach().cpu().numpy())
+print(convexity_diff_arr/50000)
 duration = time.time() - start
 #Save the RACOGA evolution
 dict = {
-    "convexity_diff_list" : convexity_diff_list/50000,
+    "convexity_diff_list" : convexity_diff_arr,
     "scalar_prod_list" : scalar_prod_list,
     "iteration_list" : iteration_list,
     "computation_time" : duration

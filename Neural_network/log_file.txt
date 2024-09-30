@@ -893,3 +893,29 @@ training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0, f
 racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0. Computation time : 432.8469285964966datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0. Computation time : 432.8469285964966 . BN
 training : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0, final training loss : tensor(463.8631, device='cuda:1', grad_fn=<AddBackward0>), test accuracy : 71.10867834394904. Computation time : 76.78507471084595 . BN
 racoga : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0. Computation time : 433.62519693374634datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 1.0, momentum = 0.0. Computation time : 433.62519693374634 . BN
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 80.4473328590393
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.31867694854736
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 80.90037274360657
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.97795057296753
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.0313766002655
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 80.21691083908081
+convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 622.9642713069916
+convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 610.0872812271118
+convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 81.37763214111328
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.1056387424469
+convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 611.8592257499695
+convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 615.8994336128235
+convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 82.54075050354004
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 80.56615447998047
+convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 621.8429501056671
+convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 619.8701021671295
+convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 81.73463821411133
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 79.81037187576294
+convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 621.0671141147614
+convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 620.0221574306488
+convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 80.386549949646
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 80.47404789924622
+convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9. Computation time : 621.3632574081421
+convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 620.0049505233765
+convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 80.30826473236084
+convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.2772524356842
