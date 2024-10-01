@@ -12,9 +12,9 @@ def racoga_values(d,N,n_ech,features_matrix,bias):
     """
     vec_ech = torch.empty(n_ech)
     vec_x = torch.empty((n_ech,d))
+    angle = torch.linspace(0,2*torch.pi,n_ech)
     for i in range(n_ech):
-        angle = torch.normal(torch.zeros(d))
-        x = angle/torch.sqrt(torch.sum(angle**2))*0.98
+        x = torch.tensor([torch.cos(angle[i]),torch.sin(angle[i])])
         vec_x[i,:] = x
         vec_ech[i] = racoga_computation(x, N, features_matrix, bias)
     return vec_x,vec_ech
@@ -26,9 +26,10 @@ def curvature_values(d,N,n_ech,features_matrix):
     curvature = torch.empty(n_ech)
     vec_x = torch.empty((n_ech,d))
     Hessian = torch.matmul(features_matrix.t(),features_matrix)
+    angle = torch.linspace(0,2*torch.pi,n_ech)
     for i in range(n_ech):
-        angle = torch.normal(torch.zeros(d))
-        vec_x[i,:] = angle/torch.sqrt(torch.sum(angle**2))
+        x = torch.tensor([torch.cos(angle[i]),torch.sin(angle[i])])
+        vec_x[i,:] = x
         norm_x = torch.sum(vec_x[i,:]**2)
         curvature[i] = torch.matmul(vec_x[i,:].t(),torch.matmul(Hessian, vec_x[i,:]))/norm_x
     return vec_x,curvature
@@ -100,24 +101,26 @@ plt.savefig("figures/curvature/racoga_only.png")
 plt.figure(figsize=(10, 5))
 val_lim = 1.5
 for i in range(2):
-    vector_shrink = 0.85
+    vector_shrink = 0.4
     if i ==0:
-        a = torch.tensor([0.2,1])
+        a = torch.tensor([0.6,0.5])
         a /=torch.sqrt(torch.sum(a**2))
         features_matrix = torch.tensor([[1,0],a])*vector_shrink
         plt.subplot(121)
     else:
-        a = torch.tensor([0.1,0.5])
+        a = torch.tensor([0.6,0.5])
         features_matrix = torch.tensor([[1,0],a])*vector_shrink
         plt.subplot(122)
     vec_ech = torch.empty(n_ech)
     vec_x = torch.empty((n_ech,d))
     vec_x,vec_ech =  racoga_values(d,N,n_ech,features_matrix,bias)
     vec_x_curvature,vec_ech_curvature = curvature_values(d,N,n_ech,features_matrix)
-    vec_x_curvature *= val_lim
+    vec_x *= 0.7
+    vec_x_curvature *= val_lim-0.2
     color_map = "CMRmap"
+    # color_map = "viridis"
     color_vec = "firebrick"
-    scatter1 = plt.scatter(vec_x_curvature[:, 0], vec_x_curvature[:, 1], c=vec_ech_curvature, cmap="viridis",marker=".",s=width)
+    scatter1 = plt.scatter(vec_x_curvature[:, 0], vec_x_curvature[:, 1], c=vec_ech_curvature, cmap=color_map,marker=".",s=width)
     scatter2 = plt.scatter(vec_x[:, 0], vec_x[:, 1], c=vec_ech, cmap=color_map,marker=".",s=width)
     cbar1 = plt.colorbar(scatter1, orientation='vertical')
     cbar2 = plt.colorbar(scatter2, orientation='vertical')
