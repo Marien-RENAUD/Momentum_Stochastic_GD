@@ -4,6 +4,24 @@ This code analyses the converge of optimization framework in a convex and non-co
  several optimization algorithms, and compute the RACOGA values of their iterates.
 
 ![Deblurring of various images with various technics including SNORE](Linear_Regression/results/gaussian_mixture/convergence/d=1000_N=_100gaussian_mixture_.png)
+
+
+
+## Installation
+To create a Python environment, please run the following command (change 'env_name' by your choice of name for the environment)
+
+```
+python -m venv env_name
+```
+To activate the environment, please run the following command
+```
+source env_name/bin/activate
+```
+To install librairie with correct version, please run the following command
+```
+pip install -r requirements.txt
+```
+
 ## File Structure
 ```
 - dataset : collection of used datasets (CIFAR-10, SPHERE)
