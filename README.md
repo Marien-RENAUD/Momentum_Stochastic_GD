@@ -1,7 +1,7 @@
 # Momentum_Stochastic_GD
 
-This code analyses the converge of optimization framework in a convex and non-convex context. 
-Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated Gradient, Stochastic Nesterov Accelerated Gradient, ADAM, RMSprop), and compute the Relaxed Averaged COrrelated Gradient Assumption (RACOGA) values of their iterates.
+This code analyses the convergence of optimization algorithms in a convex and non-convex context. 
+Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated Gradient, Stochastic Nesterov Accelerated Gradient, ADAM, RMSprop), and we compute the Relaxed Averaged COrrelated Gradient Assumption (RACOGA) values of their iterates.
 
 <figure>
   <img
