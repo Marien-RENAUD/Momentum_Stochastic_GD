@@ -10,22 +10,17 @@ Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated G
 <center> Linear regression convergence and RACOGA values with high correlation inside data. </center>
 
 ## Installation
-To create a Python environment, please run the following command (change 'env_name' by your choice of name for the environment)
-
+To create a Conda environment, please run the following command (it will be named 'conda_env')
 ```
-python -m venv env_name
+conda env create -f environment.yml
 ```
 To activate the environment, please run the following command
 ```
-source env_name/bin/activate
-```
-To install librairie with correct version, please run the following command
-```
-pip install -r requirements.txt
+conda activate conda_env
 ```
 Now you can run the code !
 
-To download dataset and use then, you can save them in the folder 'dataset'. For instance, to load cifar10, please follow instruction in [https://stackoverflow.com](https://www.cs.toronto.edu/~kriz/cifar.html).
+To download dataset and use them, you can save them in the folder 'dataset'. For instance, to load cifar10, please follow instruction in [https://stackoverflow.com](https://www.cs.toronto.edu/~kriz/cifar.html).
 
 
 
