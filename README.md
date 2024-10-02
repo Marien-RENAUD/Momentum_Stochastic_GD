@@ -1,9 +1,34 @@
 # Momentum_Stochastic_GD
 
 This code analyses the converge of optimization framework in a convex and non-convex context. 
- several optimization algorithms, and compute the RACOGA values of their iterates.
+Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated Gradient, Stochastic Nesterov Accelerated Gradient, ADAM, RMSprop), and compute the Relaxed Averaged COrrelated Gradient Assumption (RACOGA) values of their iterates.
 
-![Deblurring of various images with various technics including SNORE](Linear_Regression/results/gaussian_mixture/convergence/d=1000_N=_100gaussian_mixture_.png)
+<figure>
+  <img
+  src="Linear_Regression/results/gaussian_mixture/convergence/d=1000_N=_100gaussian_mixture_.png">
+</figure>
+<center> Linear regression convergence and RACOGA values with high correlation inside data. </center>
+
+## Installation
+To create a Python environment, please run the following command (change 'env_name' by your choice of name for the environment)
+
+```
+python -m venv env_name
+```
+To activate the environment, please run the following command
+```
+source env_name/bin/activate
+```
+To install librairie with correct version, please run the following command
+```
+pip install -r requirements.txt
+```
+Now you can run the code !
+
+To download dataset and use then, you can save them in the folder 'dataset'. For instance, to load cifar10, please follow instruction in [https://stackoverflow.com](https://www.cs.toronto.edu/~kriz/cifar.html).
+
+
+
 ## File Structure
 ```
 - dataset : collection of used datasets (CIFAR-10, SPHERE)
