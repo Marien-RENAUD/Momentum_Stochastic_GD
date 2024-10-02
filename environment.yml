@@ -1,4 +1,4 @@
-name: /beegfs/jhermant/conda/ml4ip
+name: conda_env
 channels:
   - pytorch
   - nvidia
@@ -346,4 +346,4 @@ dependencies:
       - virtualenv==20.26.5
       - wandb==0.17.4
       - xxhash==3.4.1
-prefix: /beegfs/jhermant/conda/ml4ip
+
