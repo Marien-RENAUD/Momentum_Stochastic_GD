@@ -21,6 +21,11 @@ To install librairie with correct version, please run the following command
 ```
 pip install -r requirements.txt
 ```
+Now you can run the code !
+
+
+
+
 
 ## File Structure
 ```
