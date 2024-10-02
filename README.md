@@ -10,10 +10,11 @@ Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated G
 <center> Linear regression convergence and RACOGA values with high correlation inside data. </center>
 
 ## Installation
-To create a Conda environment, please run the following command (it will be named 'conda_env')
+To create a Conda environment with all required libraries, please run the following command (it will be named 'conda_env')
 ```
 conda env create -f environment.yml
 ```
+If you need to install Conda, you may follow this link (https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
 To activate the environment, please run the following command
 ```
 conda activate conda_env
