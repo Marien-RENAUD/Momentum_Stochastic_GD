@@ -3,9 +3,11 @@
 This code analyses the converge of optimization framework in a convex and non-convex context. 
 Several optimization algorithms are implemented (GD, SGD, Nesterov Accelerated Gradient, Stochastic Nesterov Accelerated Gradient, ADAM, RMSprop), and compute the Relaxed Averaged COrrelated Gradient Assumption (RACOGA) values of their iterates.
 
-![Deblurring of various images with various technics including SNORE](Linear_Regression/results/gaussian_mixture/convergence/d=1000_N=_100gaussian_mixture_.png)
-
-
+<figure>
+  <img
+  src="Linear_Regression/results/gaussian_mixture/convergence/d=1000_N=_100gaussian_mixture_.png">
+</figure>
+<center> Linear regression convergence and RACOGA values with high correlation inside data. </center>
 
 ## Installation
 To create a Python environment, please run the following command (change 'env_name' by your choice of name for the environment)
