@@ -20,8 +20,8 @@ parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN",
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
-parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG","ADAM","RMSprop"])
-parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
+parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG", "ADAM", "RMSprop"])
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE","MNIST"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--beta_adam',type=float, default = 0.999)
@@ -32,6 +32,7 @@ parser.add_argument('--batch_normalization', type=bool, default = False, choices
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
+data_choice = hparams.data
 
 # Set seed
 def set_seed(seed):
@@ -51,7 +52,10 @@ if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
 if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
-    net = create_cnn().to(device)
+    if data_choice == "MNIST":
+        net = create_cnn(1).to(device)
+    elif data_choice == "CIFAR10":
+        net = create_cnn(3).to(device)
 
 if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
     net = create_cnn_bn().to(device)
@@ -83,17 +87,18 @@ batch_size_test = 64
 
 # load data
 to_tensor =  t.ToTensor()
-normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+if data_choice == "CIFAR10":
+    normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+elif data_choice == "MNIST":
+    normalize = t.Normalize((0.5,), (0.5,))
 flatten =  t.Lambda(lambda x:x.view(-1))
-
 transform_list = t.Compose([to_tensor, normalize, flatten])
 
-data_choice = hparams.data
 if data_choice == "CIFAR10":
     train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
     test_set = torchvision.datasets.CIFAR10(root='../dataset', train=False, transform=transform_list, download=True)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)#sampler = torch.utils.data.RandomSampler(train_set, replacement=True), batch_size=batch_size)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
 elif data_choice == "SPHERE":
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     checkpoint_test = torch.load('../dataset/sphere/test_dataset_sphere.pth')
@@ -101,6 +106,11 @@ elif data_choice == "SPHERE":
     test_dataset = torch.utils.data.TensorDataset(checkpoint_test['data'], checkpoint_test['labels'])
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size_train, shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size_test, shuffle=False)
+elif data_choice == "MNIST":
+    train_set = torchvision.datasets.MNIST(root='../dataset', train=True, transform=transform_list, download=True)
+    test_set = torchvision.datasets.MNIST(root='../dataset', train=False, transform=transform_list, download=True)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
 
 # To obtain non-homogeneous batches: batches that are composed of one class.
 batch_sample = hparams.batch_sample
@@ -144,7 +154,10 @@ for epoch in range(n_epoch): # training loop
         
         if network_type == "CNN":
             batch_size = batch.size()[0]
-            batch = batch.view((batch_size, 3, 32, 32))
+            if data_choice == "CIFAR10":
+                batch = batch.view((batch_size, 3, 32, 32))
+            elif data_choice == "MNIST":
+                batch = batch.view((batch_size, 1, 28, 28))
         else:
             batch_size = batch.size()[0]
         output = net(batch)
@@ -179,7 +192,10 @@ for i, (batch, targets) in enumerate(test_loader):
     batch = batch.to(device)
     if network_type == "CNN":
         batch_size = batch.size()[0]
-        batch = batch.view((batch_size, 3, 32, 32))
+        if data_choice == "CIFAR10":
+            batch = batch.view((batch_size, 3, 32, 32))
+        elif data_choice == "MNIST":
+            batch = batch.view((batch_size, 1, 28, 28))
     output = net(batch)
     targets = targets.to(device)
     pred = output.max(1, keepdim=True)[1]

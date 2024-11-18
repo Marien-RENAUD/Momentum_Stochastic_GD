@@ -919,3 +919,6 @@ convexity : datset = CIFAR10, n_epoch = 5, alg = SNAG, lr = 0.05, momentum = 0.9
 convexity : datset = CIFAR10, n_epoch = 5, alg = SGD, lr = 0.3, momentum = 0.0. Computation time : 620.0049505233765
 convexity : datset = CIFAR10, n_epoch = 5, alg = NAG, lr = 2.0, momentum = 0.7. Computation time : 80.30826473236084
 convexity : datset = CIFAR10, n_epoch = 5, alg = GD, lr = 4.0, momentum = 0.0. Computation time : 81.2772524356842
+training : datset = MNIST, n_epoch = 1, alg = SNAG, lr = 0.01, momentum = 0.9, final training loss : tensor(804.7863, device='cuda:0', grad_fn=<AddBackward0>), test accuracy : 96.29777070063695. Computation time : 44.227654457092285
+training : datset = MNIST, n_epoch = 5, alg = SNAG, lr = 0.01, momentum = 0.9, final training loss : tensor(36.4473, device='cuda:0', grad_fn=<AddBackward0>), test accuracy : 98.41759554140127. Computation time : 150.6992483139038
+training : datset = MNIST, n_epoch = 5, alg = SGD, lr = 0.01, momentum = 0.9, final training loss : tensor(214.3593, device='cuda:0', grad_fn=<AddBackward0>), test accuracy : 94.37699044585987. Computation time : 150.79594922065735

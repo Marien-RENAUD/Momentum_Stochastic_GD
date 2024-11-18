@@ -23,7 +23,7 @@ parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--alpha_rms',type=float, default = 0.99)
-parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE"])
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE", "MNIST"])
 parser.add_argument('--beta_adam',type=float, default = 0.999)
 parser.add_argument('--batch_normalization', type=bool, default = False, choices = [True, False])
 
@@ -48,7 +48,10 @@ if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
 
 if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
-    net = create_cnn().to(device)
+    if data_choice == "MNIST":
+        net = create_cnn(1).to(device)
+    elif data_choice == "CIFAR10":
+        net = create_cnn(3).to(device)
 
 if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
     net = create_cnn_bn().to(device)
@@ -63,7 +66,10 @@ else:
 
 #Dataset load
 to_tensor =  t.ToTensor()
-normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+if data_choice == "CIFAR10":
+    normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+elif data_choice == "MNIST":
+    normalize = t.Normalize((0.5,), (0.5,))
 flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
 train_set = torchvision.datasets.CIFAR10(root='../dataset', train=True, transform=transform_list, download=True)
@@ -75,6 +81,8 @@ elif data_choice == "SPHERE":
     # Sphere data
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     train_set = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
+elif data_choice == "MNIST":
+    train_set = torchvision.datasets.MNIST(root='../dataset', train=True, transform=transform_list, download=True)
 
 # Load results
 path_results = "results/"
@@ -86,8 +94,10 @@ else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 if batch_normalization:
     suffix += "_BN"
-dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  +suffix +'_dict_results.pth'
+dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  + suffix +'_dict_results.pth'
+print(2)
 dict_results = torch.load(dict_path)
+print(3)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]
 
@@ -116,7 +126,10 @@ if alg == "SGD" or alg == "SNAG" or alg == "ADAM" or alg == "RMSprop":
             batch = batch.to(device)
             if network_type == "CNN":
                 batch_size = batch.size()[0]
-                batch = batch.view((batch_size, 3, 32, 32))
+                if data_choice == "CIFAR10":
+                    batch = batch.view((batch_size, 3, 32, 32))
+                elif data_choice == "MNIST":
+                    batch = batch.view((batch_size, 1, 28, 28))
             output = net(batch)
             targets = targets.to(device)
             loss = criterion(output, targets)
@@ -150,7 +163,10 @@ else:
             batch = batch.to(device)
             if network_type == "CNN":
                 batch_size = batch.size()[0]
-                batch = batch.view((batch_size, 3, 32, 32))
+                if data_choice == "CIFAR10":
+                    batch = batch.view((batch_size, 3, 32, 32))
+                elif data_choice == "MNIST":
+                    batch = batch.view((batch_size, 1, 28, 28))
             output = net(batch)
             targets = targets.to(device)
             loss = criterion(output, targets)

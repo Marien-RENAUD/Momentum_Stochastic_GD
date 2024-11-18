@@ -61,9 +61,6 @@ elif data_choice == "SPHERE":
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     train_set = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
 
-
-
-
 # Load results
 path_results = "results/"
 suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + '_seed_' + str(current_seed)
