@@ -11,7 +11,7 @@ load_features = False
 features_type = 0 # Set 0 for gaussian features, 1 for uniform on the sphere features, 2 for gaussian-
 #-mixture features and 3 for orthogonal features
 
-d,N=1000,100 #choice of dimension d, number of functions N
+d, N=1000,100 #choice of dimension d, number of functions N
 
 n_sample = 10 #number of parellel occurences of stochastic algorithms
 batch_size = torch.tensor([1,10,25]) #size of batch
