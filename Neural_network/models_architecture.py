@@ -54,3 +54,14 @@ def create_cnn_bn():
     nn.Linear(128, 10)
     )
     return net
+
+def create_logistic_regression(input_dim, n_classes):
+    """
+    CNN net with batch normalization
+    """
+    net = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(input_dim, n_classes),
+    nn.Sigmoid()
+    )
+    return net

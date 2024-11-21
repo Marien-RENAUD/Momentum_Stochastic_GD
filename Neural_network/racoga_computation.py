@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm import tqdm
-from models_architecture import create_mlp, create_cnn, create_cnn_bn
+from models_architecture import create_mlp, create_cnn, create_cnn_bn, create_logistic_regression
 from argparse import ArgumentParser
 import time as time
 
 start = time.time()
 parser = ArgumentParser()
-parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
+parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP", "Logistic"])
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
@@ -23,10 +23,10 @@ parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--alpha_rms',type=float, default = 0.99)
-parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE", "MNIST"])
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE", "MNIST", "FashionMNIST", "KMNIST", "EMNIST"])
 parser.add_argument('--beta_adam',type=float, default = 0.999)
 parser.add_argument('--batch_normalization', type=bool, default = False, choices = [True, False])
-
+parser.add_argument('--n_data', type = int, default = None)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -46,15 +46,16 @@ alpha = hparams.alpha_rms
 
 if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
-
 if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
-    if data_choice == "MNIST":
+    if data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
         net = create_cnn(1).to(device)
     elif data_choice == "CIFAR10":
         net = create_cnn(3).to(device)
-
 if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
     net = create_cnn_bn().to(device)
+if network_type == "Logistic":
+    if data_choice == "CIFAR10":
+        net = create_logistic_regression(input_dim=3072, n_classes=10).to(device)
 
 criterion = nn.CrossEntropyLoss()
 if alg == "ADAM":
@@ -68,7 +69,7 @@ else:
 to_tensor =  t.ToTensor()
 if data_choice == "CIFAR10":
     normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-elif data_choice == "MNIST":
+elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
     normalize = t.Normalize((0.5,), (0.5,))
 flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
@@ -83,9 +84,43 @@ elif data_choice == "SPHERE":
     train_set = torch.utils.data.TensorDataset(checkpoint_train['data'], checkpoint_train['labels'])
 elif data_choice == "MNIST":
     train_set = torchvision.datasets.MNIST(root='../dataset', train=True, transform=transform_list, download=True)
+elif data_choice == "FashionMNIST":
+    train_set = torchvision.datasets.FashionMNIST(root='../dataset', train=True, transform=transform_list, download=True)
+elif data_choice == "KMNIST":
+    train_set = torchvision.datasets.KMNIST(root='../dataset', train=True, transform=transform_list, download=True)
+elif data_choice == "EMNIST":
+    train_set = torchvision.datasets.KMNIST(root='../dataset', train=True, transform=transform_list, download=False)
 
 # Load results
+# Save the training loss
 path_results = "results/"
+if not os.path.exists(path_results):
+    os.mkdir(path_results)
+path_results = os.path.join(path_results, data_choice)
+if not os.path.exists(path_results):
+    os.mkdir(path_results)
+path_results = os.path.join(path_results, alg)
+if not os.path.exists(path_results):
+    os.mkdir(path_results)
+if alg == "SGD" or alg == "GD":
+    path_results = os.path.join(path_results, 'lr_' +  str(lr)) 
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+elif alg == "RMSprop":
+    name_dir = 'lr_' + str(lr) + '_alpha_' + str(alpha)
+    path_results = os.path.join(path_results, name_dir) 
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+else:
+    name_dir = 'lr_' + str(lr) + '_momentum_' + str(momentum)
+    path_results = os.path.join(path_results, name_dir) 
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+if hparams.n_data != None:
+    path_results = os.path.join(path_results, "n_data_"+str(hparams.n_data))
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
+
 if alg == "ADAM":
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
 elif alg == "RMSprop":
@@ -94,10 +129,8 @@ else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 if batch_normalization:
     suffix += "_BN"
-dict_path = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  + suffix +'_dict_results.pth'
-print(2)
+dict_path = path_results+"/"+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+ '_alg_' + alg  + suffix +'_dict_results.pth'
 dict_results = torch.load(dict_path)
-print(3)
 weights_trajectory = dict_results["weights_trajectory"]
 loss_trajectory = dict_results["loss_trajectory"]
 
@@ -107,6 +140,10 @@ print("Number of iterations = {}".format(len(weights_trajectory)))
 # Computation of RACOGA
 ###
 post_process_loader = torch.utils.data.DataLoader(train_set, batch_size=128)
+if hparams.n_data != None and data_choice == "CIFAR10":
+    post_process_loader = list(post_process_loader)
+    n_batch_data = hparams.n_data // 128
+    post_process_loader = post_process_loader[:n_batch_data]
 
 step = hparams.step # interval between each RACOGA computation
 racoga_list = []
@@ -128,7 +165,7 @@ if alg == "SGD" or alg == "SNAG" or alg == "ADAM" or alg == "RMSprop":
                 batch_size = batch.size()[0]
                 if data_choice == "CIFAR10":
                     batch = batch.view((batch_size, 3, 32, 32))
-                elif data_choice == "MNIST":
+                elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
                     batch = batch.view((batch_size, 1, 28, 28))
             output = net(batch)
             targets = targets.to(device)
@@ -165,7 +202,7 @@ else:
                 batch_size = batch.size()[0]
                 if data_choice == "CIFAR10":
                     batch = batch.view((batch_size, 3, 32, 32))
-                elif data_choice == "MNIST":
+                elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
                     batch = batch.view((batch_size, 1, 28, 28))
             output = net(batch)
             targets = targets.to(device)
@@ -203,7 +240,7 @@ else:
     suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
 if batch_normalization:
     suffix += "_BN"
-save_name = path_results+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
+save_name = path_results+"/"+network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+ alg+ suffix
 np.save(save_name+'_racoga_results.npy', dict)
 
 plt.plot(iteration_list, racoga_list)

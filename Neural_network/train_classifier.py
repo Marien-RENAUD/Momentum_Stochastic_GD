@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from time import time
 from tqdm.auto import tqdm
-from models_architecture import create_mlp, create_cnn, create_cnn_bn
+from models_architecture import create_mlp, create_cnn, create_cnn_bn, create_logistic_regression
 from argparse import ArgumentParser
 from utils import sort_batches
 from utils import calculate_training_loss
@@ -16,12 +16,12 @@ import time as time
 start = time.time()
 # Define Parser arguments
 parser = ArgumentParser()
-parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP"])
+parser.add_argument('--network_type', type=str, default = "CNN", choices=["CNN", "MLP", "Logistic"])
 parser.add_argument('--batch_sample', type=str, default = "random_with_rpl", choices=["random_with_rpl", "determinist", "sort", "random_sort"])
 parser.add_argument('--device', type=int, default = 0)
 parser.add_argument('--n_epoch', type=int, default = 5)
 parser.add_argument('--alg', type=str, default = "SNAG", choices = ["SNAG", "SGD", "GD", "NAG", "ADAM", "RMSprop"])
-parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE","MNIST"])
+parser.add_argument('--data', type=str, default = "CIFAR10", choices = ["CIFAR10", "SPHERE","MNIST","FashionMNIST","KMNIST","EMNIST"])
 parser.add_argument('--lr', type=float, default = 0.01)
 parser.add_argument('--momentum', type=float, default = 0.9)
 parser.add_argument('--beta_adam',type=float, default = 0.999)
@@ -29,6 +29,7 @@ parser.add_argument('--alpha_rms',type=float, default = 0.99)
 parser.add_argument('--seed', type=int, default = 42)
 parser.add_argument('--grid_search', type=bool, default = False, choices = [True, False])
 parser.add_argument('--batch_normalization', type=bool, default = False, choices = [True, False])
+parser.add_argument('--n_data', type = int, default = None)
 hparams = parser.parse_args()
 
 device = torch.device('cuda:'+str(hparams.device) if torch.cuda.is_available() else 'cpu')
@@ -50,15 +51,17 @@ grid_search = hparams.grid_search
 network_type = hparams.network_type
 if network_type == "MLP":# MLP architecture
     net = create_mlp().to(device)
-
 if network_type == "CNN" and batch_normalization == False:# Light CNN architecture
-    if data_choice == "MNIST":
+    if data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
         net = create_cnn(1).to(device)
     elif data_choice == "CIFAR10":
         net = create_cnn(3).to(device)
-
 if network_type == "CNN" and batch_normalization:# Light CNN architecture with batch normalization
     net = create_cnn_bn().to(device)
+if network_type == "Logistic":
+    if data_choice == "CIFAR10":
+        net = create_logistic_regression(input_dim=3072, n_classes=10).to(device)
+
 criterion = nn.CrossEntropyLoss()
 
 momentum = hparams.momentum
@@ -89,7 +92,7 @@ batch_size_test = 64
 to_tensor =  t.ToTensor()
 if data_choice == "CIFAR10":
     normalize = t.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-elif data_choice == "MNIST":
+elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
     normalize = t.Normalize((0.5,), (0.5,))
 flatten =  t.Lambda(lambda x:x.view(-1))
 transform_list = t.Compose([to_tensor, normalize, flatten])
@@ -99,6 +102,10 @@ if data_choice == "CIFAR10":
     test_set = torchvision.datasets.CIFAR10(root='../dataset', train=False, transform=transform_list, download=True)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
+    if hparams.n_data != None:
+        train_loader = list(train_loader)
+        n_batch_data = hparams.n_data // batch_size_train
+        train_loader = train_loader[:n_batch_data]
 elif data_choice == "SPHERE":
     checkpoint_train = torch.load('../dataset/sphere/train_dataset_sphere.pth')
     checkpoint_test = torch.load('../dataset/sphere/test_dataset_sphere.pth')
@@ -109,6 +116,21 @@ elif data_choice == "SPHERE":
 elif data_choice == "MNIST":
     train_set = torchvision.datasets.MNIST(root='../dataset', train=True, transform=transform_list, download=True)
     test_set = torchvision.datasets.MNIST(root='../dataset', train=False, transform=transform_list, download=True)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
+elif data_choice == "FashionMNIST":
+    train_set = torchvision.datasets.FashionMNIST(root='../dataset', train=True, transform=transform_list, download=True)
+    test_set = torchvision.datasets.FashionMNIST(root='../dataset', train=False, transform=transform_list, download=True)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
+elif data_choice == "KMNIST":
+    train_set = torchvision.datasets.KMNIST(root='../dataset', train=True, transform=transform_list, download=True)
+    test_set = torchvision.datasets.KMNIST(root='../dataset', train=False, transform=transform_list, download=True)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
+elif data_choice == "EMNIST":
+    train_set = torchvision.datasets.EMNIST(root='../dataset', split = 'mnist', train=True, transform=transform_list, download=False)
+    test_set = torchvision.datasets.EMNIST(root='../dataset', split = 'mnist', train=False, transform=transform_list, download=False)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=False)
 
@@ -156,7 +178,7 @@ for epoch in range(n_epoch): # training loop
             batch_size = batch.size()[0]
             if data_choice == "CIFAR10":
                 batch = batch.view((batch_size, 3, 32, 32))
-            elif data_choice == "MNIST":
+            elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
                 batch = batch.view((batch_size, 1, 28, 28))
         else:
             batch_size = batch.size()[0]
@@ -194,7 +216,7 @@ for i, (batch, targets) in enumerate(test_loader):
         batch_size = batch.size()[0]
         if data_choice == "CIFAR10":
             batch = batch.view((batch_size, 3, 32, 32))
-        elif data_choice == "MNIST":
+        elif data_choice == "MNIST" or data_choice == "FashionMNIST" or data_choice == "KMNIST" or data_choice == "EMNIST":
             batch = batch.view((batch_size, 1, 28, 28))
     output = net(batch)
     targets = targets.to(device)
@@ -258,6 +280,10 @@ else:
         path_results = os.path.join(path_results, name_dir) 
         if not os.path.exists(path_results):
             os.mkdir(path_results)
+if hparams.n_data != None:
+    path_results = os.path.join(path_results, "n_data_"+str(hparams.n_data))
+    if not os.path.exists(path_results):
+        os.mkdir(path_results)
 
 duration = time.time() - start
 # Save the training trajectory in a torch dictionary
@@ -293,22 +319,22 @@ plt.xlabel("number of iterations")
 plt.ylabel("Training Loss")
 plt.savefig(save_name+"training_trajectory.png")
 
+# if grid_search == False:
+#     path_results = "results/"
+#     dict_loss = {"loss_trajectory" : loss_trajectory}
+#     if alg == "ADAM":
+#         suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
+#     elif alg == "RMSprop":
+#         suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
+#     else:
+#         suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
+#     if batch_normalization:
+#         suffix += "_BN"
+save_name = path_results + '/' + network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
 if grid_search == False:
-    path_results = "results/"
-    dict_loss = {"loss_trajectory" : loss_trajectory}
-    if alg == "ADAM":
-        suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_beta_" + str(beta) + "_seed_" + str(current_seed)
-    elif alg == "RMSprop":
-        suffix = "_lr_" + str(lr) + "_alpha_" + str(alpha) + "_seed_" + str(current_seed)
-    else:
-        suffix = "_lr_" + str(lr) + "_momentum_" + str(momentum) + "_seed_" + str(current_seed)
-    if batch_normalization:
-        suffix += "_BN"
-    save_name = path_results +network_type+'_n_epoch_'+str(n_epoch)+'_batch_'+batch_sample+'_alg_'+alg+suffix 
-    if grid_search == False:
-        torch.save(dict_results, save_name+'_dict_results.pth')
-        torch.save(dict_loss, save_name+'_dict_loss.pth')
-    print("Model save in the adress : "+save_name+'dict_results.pth')
+    torch.save(dict_results, save_name+'_dict_results.pth')
+    torch.save(dict_loss, save_name+'_dict_loss.pth')
+print("Model save in the adress : "+save_name+'dict_results.pth')
 
 # Save info
 log_print = ''
