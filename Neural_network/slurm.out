@@ -1,3 +1,0 @@
-slurmstepd: error: execve(): convexity_measure_run.sh: Permission denied
-srun: error: sirocco24: task 0: Exited with exit code 13
-Job finished
